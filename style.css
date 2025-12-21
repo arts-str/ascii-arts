@@ -1,0 +1,14 @@
+html, body{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+#container{
+    white-space: pre;
+    font-family: monospace;
+    font-size: 5px;
+    line-height: 5px;
+    letter-spacing: 2px;
+    transform: unset;
+}
