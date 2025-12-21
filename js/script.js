@@ -1,37 +1,41 @@
 const imageInput = document.getElementById("image-input");
-const canvas = document.getElementById("canvas");
+const widthInput = document.getElementById("width-input");
+const fontSizeInput = document.getElementById("font-size-input");
+const canvas = document.createElement('canvas');
 const container = document.getElementById("container");
 const ctx = canvas.getContext('2d');
 
 const atlas = [" ", ".", "-", "/", "=", "+", "%", "@"];
 
+const READER = new FileReader();
+let img = new Image();
+let imgData;
+
+let MAX_WIDTH = 300; // try 80–200
+
 imageInput.oninput = () =>{
-    const READER = new FileReader();
-    let img = new Image();
-    let imgData;
     
     READER.onload = (e) =>{
-        
         img.src = e.target.result;
-        ctx.drawImage(img, 0, 0);
-        imgData = ctx.getImageData(0, 0, img.width, img.height);
-        grayscale(imgData);
-        console.log(returnPixelBWValueFromData(imgData))
-        let pixelsValues = returnPixelBWValueFromData(imgData);
-        let array2D = to2DArray(pixelsValues, img.width, img.height);
-
-        let line = "";
-        for (let j = 0; j < img.height; j++) {
-            for (let i = 0; i < img.width; i++) {
-                line += returnAltasForValue(array2D[j][i]);
-            }
-            line += "<br>"
-        }
-        console.log(line);
-        container.innerHTML = line;
     }
+
+    img.onload = () => {
+        drawAscii();
+    };
+
     READER.readAsDataURL(imageInput.files[0]);
-    
+}
+
+widthInput.oninput = () =>{
+    MAX_WIDTH = widthInput.value;
+    if (img.src != "") {
+        drawAscii();
+    }
+}
+
+fontSizeInput.oninput = () =>{
+    container.style.fontSize = fontSizeInput.value + "px";
+    container.style.lineHeight = fontSizeInput.value + "px";
 }
 
 function returnPixelFromData(imgData) {
@@ -106,4 +110,35 @@ function to2DArray(arr, n, m) {
     }
 
     return result;
+}
+
+function drawAscii() {
+    const SCALE_Y = 0.5;
+
+    const scale = Math.min(1, MAX_WIDTH / img.width);
+
+    const width = Math.floor(img.width * scale);
+    const height = Math.floor(img.height * scale * SCALE_Y);
+
+
+    canvas.width = width;
+    canvas.height = height;
+
+    ctx.drawImage(img, 0, 0, width, height);
+
+    const imgData = ctx.getImageData(0, 0, width, height);
+    grayscale(imgData);
+
+    const pixelsValues = returnPixelBWValueFromData(imgData);
+    const array2D = to2DArray(pixelsValues, width, height);
+
+    let line = "";
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            line += returnAltasForValue(array2D[y][x]);
+        }
+        line += "<br>";
+    }
+
+    container.innerHTML = line;
 }

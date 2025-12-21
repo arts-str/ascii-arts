@@ -8,12 +8,13 @@
 </head>
 <body>
 
-    <label for="imagen">Sube una imagen aquí</label> <br>
+    <label for="image-input">Sube una imagen aquí</label> <br>
     <input id="image-input" type="file" accept="image/png, image/jpeg, image/x-icon" capture="environment" name="imagen"><br>
-    
-    <canvas width="300px" height="300px" id="canvas"></canvas>
-
-    <div id="container"></div>
+    <label for="width-input">Ancho del arte ASCII</label>
+    <input id="width-input" type="range" min="50" max="500" name="ancho">
+    <label for="font-size-input">Tamaño de la fuente</label>
+    <input id="font-size-input" type="range" min="5" max="24" name="font-size">
+    <pre id="container"></pre>
     <script src="js/script.js"></script>
 </body>
 </html>

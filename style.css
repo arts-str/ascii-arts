@@ -9,6 +9,6 @@ html, body{
     font-family: monospace;
     font-size: 5px;
     line-height: 5px;
-    letter-spacing: 2px;
+    letter-spacing: unset;
     transform: unset;
 }
