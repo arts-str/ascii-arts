@@ -1,14 +1,86 @@
+:root{
+    --bg: #000000;
+    --fg: #ffffff;
+    --art-fg: #000000;
+    --art-bg: #ffffff;
+    --warning: #ff9e20;
+    font-family: "Hanken Grotesk", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+}
 html, body{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    background-color: var(--bg);
+    color: var(--fg);
 }
 
 #container{
+    margin: 0;
     white-space: pre;
     font-family: monospace;
     font-size: 5px;
     line-height: 5px;
     letter-spacing: unset;
     transform: unset;
+    background-color: var(--art-bg);
+    color: var(--art-fg);
+    width: fit-content;
+}
+.controls{
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    position: fixed;
+    background-color: var(--bg);
+    mix-blend-mode: difference;
+    bottom: 0;
+    right: 0;
+    transition: transform 200ms ease-in;
+}
+
+
+
+.controls:has(fieldset:hover){
+    mix-blend-mode: normal;
+}
+
+.warning{
+    background-color: var(--warning);
+}
+
+.inactive{
+    display: none;
+}
+#width-warning{
+    font-size: smaller;
+    font-style: italic;
+    margin: 0;
+    text-align: center;
+}
+
+#character-inputs input[type=text]{
+    width: 16px;
+    background-color: var(--bg);
+    color: var(--fg);
+}
+
+.controls section{
+    display: flex;
+    align-items: center;
+}
+#controls-header h3{
+    margin-right: .5rem;
+}
+#controls-header svg{
+    transition: rotate 200ms ease-in;
+}
+
+.rotated{
+    rotate: 180deg;
+}
+.closed-controls{
+    transform: translate(50%, 80%);
 }
