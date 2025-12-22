@@ -39,9 +39,8 @@ html, body{
     bottom: 0;
     right: 0;
     transition: transform 200ms ease-in;
+    padding-left: 1rem;
 }
-
-
 
 .controls:has(fieldset:hover){
     mix-blend-mode: normal;
@@ -73,6 +72,7 @@ html, body{
 }
 #controls-header h3{
     margin-right: .5rem;
+    margin-top: .5rem;
 }
 #controls-header svg{
     transition: rotate 200ms ease-in;
@@ -82,5 +82,5 @@ html, body{
     rotate: 180deg;
 }
 .closed-controls{
-    transform: translate(50%, 80%);
+    transform: translate(50%, 85%);
 }

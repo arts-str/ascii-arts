@@ -6,6 +6,9 @@ for (const slider of sliders) {
     
     
     slider.onmouseover = () =>{
+        for (const element of sliders) {
+            element.blur();
+        }
         slider.onwheel = (e) =>{
             e.preventDefault();
             slider.value -= Math.round((space/e.deltaY*5));
@@ -13,5 +16,19 @@ for (const slider of sliders) {
         }
         
     } 
+    const onWheel = (e) => {
+        e.preventDefault();
+        slider.value -= Math.round(space / e.deltaY * 5);
+        slider.dispatchEvent(new Event('input'));
+    };
+
+    slider.onfocus = () => {
+        document.addEventListener('wheel', onWheel, { passive: false });
+    };
+
+    slider.onblur = () => {
+        document.removeEventListener('wheel', onWheel);
+    };
+
 
 }

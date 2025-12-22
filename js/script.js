@@ -1,12 +1,9 @@
 const imageInput = document.getElementById("image-input");
 const widthInput = document.getElementById("width-input");
-const fontSizeInput = document.getElementById("font-size-input");
 const widthOutput= document.getElementById("width-output");
 const widthWarning = document.getElementById("width-warning");
 const fontSizeOutput = document.getElementById("font-size-output");
 const characterInput = document.getElementById("character-inputs");
-
-const controlHeader = document.getElementById("controls-header");
 
 const canvas = document.createElement('canvas');
 const container = document.getElementById("container");
@@ -40,22 +37,12 @@ widthInput.oninput = () =>{
     widthOutput.textContent = widthInput.value + " caracteres";
 
     if (img.src != "") {
-        if (img.width < Number(widthInput.value)) {
-            widthOutput.parentElement.classList.add('warning');
-            widthWarning.classList.remove('inactive');
-        }else{
-            widthWarning.classList.add('inactive');
-            widthOutput.parentElement.classList.remove('warning');
-        }
+        activateWidthWarning();
         drawAscii();
     }
 }
 
-fontSizeInput.oninput = () =>{
-    container.style.fontSize = fontSizeInput.value + "px";
-    container.style.lineHeight = fontSizeInput.value + "px";
-    fontSizeOutput.textContent = fontSizeInput.value + "px";
-}
+
 
 window.onload = () =>{
     if (localStorage.getItem('image-loaded') !== null) {
@@ -72,22 +59,24 @@ window.onload = () =>{
     fontSizeOutput.textContent = fontSizeInput.value + "px";
 }
 
-for (const input of characterInput.elements) {    
-    input.oninput = (e) =>{
-        input.value = input.value.slice(0, 1); // keep only 1 character
+for (const input of characterInput.elements) {
+    input.oninput = () => {
+        // keep only the first character typed
+        input.value = input.value.slice(0, 1);
 
         const position = [...characterInput.elements].indexOf(input);
-        atlas[position] = input.value;     
-        if (img.src != "") {
+
+        // if input is empty, use a space
+        atlas[position] = input.value === "" ? " " : input.value;
+
+        if (img.src !== "") {
             drawAscii();
         }
-    }
+    };
 }
 
-controlHeader.onclick = () =>{
-    controlHeader.children[1].classList.toggle("rotated");
-    controlHeader.parentElement.classList.toggle("closed-controls");
-}
+
+
 
 function returnPixelFromData(imgData) {
     let pixels = [];
