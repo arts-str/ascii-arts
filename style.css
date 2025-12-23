@@ -15,6 +15,7 @@ html, body{
     box-sizing: border-box;
     background-color: var(--bg);
     color: var(--fg);
+    touch-action: manipulation;
 }
 
 #container{
@@ -83,4 +84,14 @@ html, body{
 }
 .closed-controls{
     transform: translate(50%, 85%);
+}
+
+@media screen and (max-width: 768px) {
+    input[type='range']{
+        height:10px; 
+    }
+    input[type='range']::-webkit-slider-thumb{ 
+        height:30px;
+        width:30px;
+    } 
 }

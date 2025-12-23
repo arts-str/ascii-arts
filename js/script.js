@@ -4,6 +4,8 @@ const widthOutput= document.getElementById("width-output");
 const widthWarning = document.getElementById("width-warning");
 const fontSizeOutput = document.getElementById("font-size-output");
 const characterInput = document.getElementById("character-inputs");
+const downloadPNGButton = document.getElementById("download-png");
+const downloadSVGButton = document.getElementById("download-svg");
 
 const canvas = document.createElement('canvas');
 const container = document.getElementById("container");
@@ -15,20 +17,22 @@ const READER = new FileReader();
 let img = new Image();
 let imgData;
 
-let MAX_WIDTH = 300; // try 80–200
+let MAX_WIDTH = widthInput.value; // try 80–200
 
-imageInput.oninput = () =>{
-    
-    READER.onload = (e) =>{
+imageInput.oninput = async () =>{
+    const file = imageInput.files[0];
+    if (!file) return;
+
+    READER.onload = async (e) =>{
         img.src = e.target.result;
-        localStorage.setItem('image-loaded', e.target.result);
+        await saveImageToDB('image-loaded', e.target.result);
     }
 
     img.onload = () => {
         drawAscii();
     };
 
-    READER.readAsDataURL(imageInput.files[0]);
+    READER.readAsDataURL(file);
 }
 
 widthInput.oninput = () =>{
@@ -44,14 +48,12 @@ widthInput.oninput = () =>{
 
 
 
-window.onload = () =>{
-    if (localStorage.getItem('image-loaded') !== null) {
-        img.src = localStorage.getItem('image-loaded');
-        img.onload = () => {
-            drawAscii();
-        };
+window.onload = async () =>{
+    const savedImage = await loadImageFromDB('image-loaded');
+    if (savedImage) {
+        img.src = savedImage;
+        img.onload = () => drawAscii();
     }
-
     for (let i = 0; i < characterInput.elements.length; i++) {
         characterInput.elements[i].value = atlas[i]
     }
@@ -182,3 +184,115 @@ function drawAscii() {
 
     container.textContent = line;
 }
+
+let font = "24px monospace"
+let lineHeight = 24;
+
+function saveAsciiAsImage() {
+    let art = container.textContent;
+
+    const saveCanvas = document.createElement('canvas');
+    const saveCTX = saveCanvas.getContext('2d');
+
+    saveCTX.font = font;
+
+    const lines = art.split('\n');
+    let maxWidth = 0;
+    lines.forEach(line =>{
+        const metrics = saveCTX.measureText(line)
+        if (metrics.width > maxWidth) {
+            maxWidth = metrics.width;
+        }
+    });
+
+    const MAX_CANVAS_PIXELS = 80_000_000;
+
+    const totalPixels = maxWidth * lines.length * lineHeight;
+
+    if (totalPixels > MAX_CANVAS_PIXELS) {
+        alert("Image too large to export. Reduce resolution or width.");
+        return;
+    }
+
+    saveCanvas.width = maxWidth;
+    saveCanvas.height = lines.length * lineHeight;
+
+    saveCTX.fillStyle = '#ffffff00';
+    saveCTX.fillRect(0, 0, saveCanvas.width, saveCanvas.height);
+    saveCTX.fillStyle = '#000000';
+    saveCTX.font = font;
+
+    lines.forEach((line, index) =>{
+        saveCTX.fillText(line, 0, 0 + (index +1) * lineHeight);
+    });
+
+    const image = saveCanvas.toDataURL('image/png');
+    const link = document.createElement('a');
+    link.download = 'ascii-arts.png';
+    link.href = image;
+    link.click();
+
+    saveCTX.setTransform(1, 0, 0, 1, 0, 0);
+    saveCanvas.width = 0;
+    saveCanvas.height = 0;
+}
+
+downloadPNGButton.onclick = () =>{
+    saveAsciiAsImage();
+}
+downloadSVGButton.onclick = () =>{
+    saveAsciiSvg();
+}
+function saveAsciiSvg() {
+    let art = container.textContent;
+    let svg = document.createElement('svg')
+
+    const lines = art.split('\n');
+    console.log(lines);
+
+    svg.style.font = font;
+    svg.style.whiteSpace = "pre";
+
+    lines.forEach((line, i) =>{
+        let textLine = document.createElement('text');
+        textLine.textContent = line;
+        textLine.setAttribute('x', 0);
+        textLine.setAttribute('y', lineHeight*(i+1));
+        textLine.setAttribute('xml:space', "preserve");
+        textLine.setAttribute('font-family', "monospace");
+        svg.appendChild(textLine);
+    });
+
+    let lineWidth = lines[0].length * (lineHeight * 0.6);
+
+    //get svg source.
+    var serializer = new XMLSerializer();
+    var source = serializer.serializeToString(svg);
+    
+    
+    source = source.replace(
+      /<svg\b([^>]*)xmlns="http:\/\/www\.w3\.org\/1999\/xhtml"/,
+      '<svg xmlns="http://www.w3.org/2000/svg"'
+    );
+    if (!source.match(/<svg[^>]*\bversion="/)) {
+      source = source.replace(
+        /<svg\b/,
+        '<svg version="1.1"'
+      );
+    }
+    if (!source.match(/<svg[^>]*\bviewBox="/)) {
+      source = source.replace(
+        /<svg\b/,
+        `<svg viewBox="0 0 ${lineWidth} ${lineHeight*lines.length}"`
+      );
+    }
+    //convert svg source to URI data scheme.
+    var url = "data:image/svg+xml;charset=utf-8,"+ encodeURIComponent(source);
+
+    const link = document.createElement('a');
+    link.download = 'ascii-arts.svg';
+    link.href = url;
+    link.click();
+}
+
+/**TODO: PERMITIR ASCII EN BASE A LOS COLORES DE LA IMAGEN */
