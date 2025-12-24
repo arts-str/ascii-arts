@@ -86,6 +86,15 @@ html, body{
     transform: translate(50%, 85%);
 }
 
+#copy-dialog{
+    opacity: 0;
+    transition: all 200ms ease-in;
+}
+
+.dialog-show{
+    opacity: 1;
+}
+
 @media screen and (max-width: 768px) {
     input[type='range']{
         height:10px; 
