@@ -16,6 +16,7 @@ let atlas = ["@", "%", "+", "=", "/", "-", ".", " "]; //ATLAS DE CARACTERES
 let img = new Image(); //Imagen
 let imgData; //imgData global vacio
 let MAX_WIDTH = widthInput.value; // Tamaño de la imagen del canvas
+let invertInput = document.getElementById("invert-input");
 
 imageInput.oninput = async () =>{ //Cuando el usuario sube una imagen
     const file = imageInput.files[0]; //Tomamos el archivo
@@ -48,9 +49,8 @@ window.onload = async () =>{ //Cuando carga la página
         img.src = savedImage; //Cargamos la imagen
         img.onload = () => drawAscii(); //Al cargar, se dibuja
     }
-    for (let i = 0; i < characterInput.elements.length; i++) { //Se carga el atlas a las inputs de atlas
-        characterInput.elements[i].value = atlas[i]
-    }
+
+    updateAtlasInput();
 
     //Se cargan los valores de los sliders a sus output label
     widthOutput.textContent = widthInput.value + " caracteres"; 
@@ -313,4 +313,20 @@ function mostrarDialog(dialog) {
         dialog.close() //Lo cierra
     }, 2200);
 }
+
+invertInput.onchanged = () =>{
+    reverseAtlas();
+}
+
+function reverseAtlas(){
+    atlas.reverse();
+    updateAtlasInput();
+}
+
+function updateAtlasInput(){
+    for (let i = 0; i < characterInput.elements.length; i++) { //Se carga el atlas a las inputs de atlas
+        characterInput.elements[i].value = atlas[i]
+    }
+}
+
 /**TODO: PERMITIR ASCII EN BASE A LOS COLORES DE LA IMAGEN */
