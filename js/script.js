@@ -321,6 +321,7 @@ invertInput.onchange = () =>{
 function reverseAtlas(){
     atlas.reverse();
     updateAtlasInput();
+    drawAscii();
 }
 
 function updateAtlasInput(){
