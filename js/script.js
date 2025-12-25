@@ -314,7 +314,7 @@ function mostrarDialog(dialog) {
     }, 2200);
 }
 
-invertInput.onchanged = () =>{
+invertInput.onchange = () =>{
     reverseAtlas();
 }
 
