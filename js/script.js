@@ -316,6 +316,7 @@ function mostrarDialog(dialog) {
 
 invertInput.onchange = () =>{
     reverseAtlas();
+    alert("input");
 }
 
 function reverseAtlas(){
@@ -325,6 +326,7 @@ function reverseAtlas(){
 }
 
 function updateAtlasInput(){
+    alert(updateAltas);
     for (let i = 0; i < characterInput.elements.length; i++) { //Se carga el atlas a las inputs de atlas
         characterInput.elements[i].value = atlas[i]
     }
