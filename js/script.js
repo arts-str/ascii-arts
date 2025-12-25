@@ -16,7 +16,7 @@ let atlas = ["@", "%", "+", "=", "/", "-", ".", " "]; //ATLAS DE CARACTERES
 let img = new Image(); //Imagen
 let imgData; //imgData global vacio
 let MAX_WIDTH = widthInput.value; // Tamaño de la imagen del canvas
-let invertInput = document.getElementById("invert-input");
+const invertInput = document.getElementById("invert-input");
 
 imageInput.oninput = async () =>{ //Cuando el usuario sube una imagen
     const file = imageInput.files[0]; //Tomamos el archivo
@@ -314,7 +314,7 @@ function mostrarDialog(dialog) {
     }, 2200);
 }
 
-invertInput.onchange = () =>{
+invertInput.oninput = () =>{
     reverseAtlas();
     alert("input");
 }
@@ -326,7 +326,7 @@ function reverseAtlas(){
 }
 
 function updateAtlasInput(){
-    alert(updateAltas);
+    alert("updateAltas");
     for (let i = 0; i < characterInput.elements.length; i++) { //Se carga el atlas a las inputs de atlas
         characterInput.elements[i].value = atlas[i]
     }
