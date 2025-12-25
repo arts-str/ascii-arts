@@ -87,6 +87,16 @@ function returnPixelBWValueFromData(imgData) {
     return pixels //Devuelve el array de pixeles
 }
 
+function returnPixelColorValue(imgData) {
+    let data = imgData.data;
+    let pixels = [];
+    for (let i = 0; i < data.length; i+=4) {
+        pixels.push([data[i], data[i+1], data[i+2]])
+        
+    }
+    return pixels
+}
+
 /**Devuelve el caracter correcto dependiendo del valor del pixel */
 function returnAltasForValue(value) {
     let possiblePositions = atlas.length; //Total de elementos en el atlas
@@ -133,19 +143,21 @@ function drawAscii() {
     ctx.drawImage(img, 0, 0, width, height); //Dibuja la imagen
 
     const imgData = ctx.getImageData(0, 0, width, height); //Toma la data de la imagen
-
+    const pixelColorValues = returnPixelColorValue(imgData);
+    const imgData2D = to2DArray(pixelColorValues, width, height);
+    
     const pixelsValues = returnPixelBWValueFromData(imgData); //Valores en ByN
     const array2D = to2DArray(pixelsValues, width, height); //Valores en ByN hechos array 2D
 
     let line = ""; //String de linea
     for (let y = 0; y < height; y++) { //Por cada fila
         for (let x = 0; x < width; x++) { //Y cada columna
-            line += returnAltasForValue(array2D[y][x]); //Agregar a la linea el caracter correcto para esa posición
+            line += `<p style="display:inline; color:rgb(${imgData2D[y][x][0]},${imgData2D[y][x][1]},${imgData2D[y][x][2]})">${returnAltasForValue(array2D[y][x])}</p>`; //Agregar a la linea el caracter correcto para esa posición
         }
-        line += "\n"; //Al final de cada fila agrega un salto de linea
+        line += "<br>"; //Al final de cada fila agrega un salto de linea
     }
 
-    container.textContent = line; //Agrega el ascii al container
+    container.innerHTML = line; //Agrega el ascii al container
 }
 
 /**METODOS PARA GUARDAR EL ASCII */
