@@ -52,8 +52,13 @@
                 <button type="button" id="copy-to-clipboard">Copiar ASCII</button>
             </fieldset>
             <fieldset>
-                <legend>Invert image</legend>
-                <input id="invert-input" type="checkbox">
+                <legend>Control de imagen</legend>
+                <label for="invert-color-input">Invertir colores</label>
+                <input id="invert-color-input" type="checkbox">
+                <label for="invert-chars-input">Invertir imagen</label>
+                <input id="invert-chars-input" type="checkbox">
+                <label for="monochrome-input">Color</label>
+                <input id="monochrome-input" type="checkbox" checked>
             </fieldset>
         </form>
         <pre id="container"></pre>

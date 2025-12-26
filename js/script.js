@@ -8,6 +8,9 @@ const downloadPNGButton = document.getElementById("download-png");
 const downloadSVGButton = document.getElementById("download-svg");
 const copyASCII = document.getElementById("copy-to-clipboard");
 const copyDialog = document.getElementById("copy-dialog");
+const colorInput = document.getElementById("monochrome-input");
+const invertColorInput = document.getElementById("invert-color-input");
+const invertCharsInput = document.getElementById("invert-chars-input");
 const canvas = document.createElement('canvas');
 const container = document.getElementById("container");
 const ctx = canvas.getContext('2d');
@@ -16,7 +19,9 @@ let atlas = ["@", "%", "+", "=", "/", "-", ".", " "]; //ATLAS DE CARACTERES
 let img = new Image(); //Imagen
 let imgData; //imgData global vacio
 let MAX_WIDTH = widthInput.value; // Tamaño de la imagen del canvas
-const invertInput = document.getElementById("invert-input");
+
+let colorMode = colorInput.checked;
+let isColorInverted = invertColorInput.checked;
 
 imageInput.oninput = async () =>{ //Cuando el usuario sube una imagen
     const file = imageInput.files[0]; //Tomamos el archivo
@@ -44,6 +49,8 @@ widthInput.oninput = () =>{ //Cuando se modifica el slider de ancho
     }
 }
 window.onload = async () =>{ //Cuando carga la página
+
+
     const savedImage = await loadImageFromDB('image-loaded'); //Buscamos una imagen previa en IndexerDB
     if (savedImage) { //Si existe
         img.src = savedImage; //Cargamos la imagen
@@ -51,7 +58,13 @@ window.onload = async () =>{ //Cuando carga la página
     }
 
     updateAtlasInput();
-
+    if (isColorInverted) {
+        const width = canvas.width;
+        const height = canvas.height
+        imgData = ctx.getImageData(0, 0, width, height); //Toma la data de la imagen
+        invertImg(imgData);
+        reverseAtlas();
+    }
     //Se cargan los valores de los sliders a sus output label
     widthOutput.textContent = widthInput.value + " caracteres"; 
     fontSizeOutput.textContent = fontSizeInput.value + "px";
@@ -104,30 +117,10 @@ function returnAltasForValue(value) {
     return atlas[index] //Devuelve el caracter correcto del atlas
 }
 
-/**Pasa un array de 1D a uno de 2D
- * @param arr El array 1D
- * @param n Ancho del nuevo array
- * @param m Alto del nuevo array
- * @returns Array 2D
-*/
-function to2DArray(arr, n, m) {
-    if (arr.length !== n * m) {
-        throw new Error("Array size does not match dimensions");
-    }
-
-    const result = [];
-
-    for (let row = 0; row < m; row++) {
-        result.push(arr.slice(row * n, row * n + n));
-    }
-
-    return result;
-}
-
 /**
  * Funcion para dibujar en ASCII
  */
-function drawAscii() {
+function drawAsciiColor() {
     const SCALE_Y = 0.5; //Escala en vertical para tener en cuenta que los caracteres tienen mas alto que ancho
 
     const scale = Math.min(1, Number(MAX_WIDTH) / img.width); //Calcula la escala
@@ -142,19 +135,63 @@ function drawAscii() {
 
     ctx.drawImage(img, 0, 0, width, height); //Dibuja la imagen
 
-    const imgData = ctx.getImageData(0, 0, width, height); //Toma la data de la imagen
-    const pixelColorValues = returnPixelColorValue(imgData);
-    const imgData2D = to2DArray(pixelColorValues, width, height);
-    
-    const pixelsValues = returnPixelBWValueFromData(imgData); //Valores en ByN
-    const array2D = to2DArray(pixelsValues, width, height); //Valores en ByN hechos array 2D
+    imgData = ctx.getImageData(0, 0, width, height); //Toma la data de la imagen
+    if (isColorInverted) invertImg(imgData);
+    posterizeImageData(imgData, 3);
+    ctx.putImageData(imgData, 0, 0);
+    const bw = returnPixelBWValueFromData(imgData); //Valores en ByN
+    const colors = returnPixelColorValue(imgData);
 
-    let line = ""; //String de linea
-    for (let y = 0; y < height; y++) { //Por cada fila
-        for (let x = 0; x < width; x++) { //Y cada columna
-            line += `<p style="display:inline; color:rgb(${imgData2D[y][x][0]},${imgData2D[y][x][1]},${imgData2D[y][x][2]})">${returnAltasForValue(array2D[y][x])}</p>`; //Agregar a la linea el caracter correcto para esa posición
+    let html = '<pre class="ascii-art">'
+    let lastColor = null;
+
+    for (let i = 0; i < bw.length; i++) {
+        const char = returnAltasForValue(bw[i]);
+        const [r, g, b] = colors[i];
+        const color = `${r}, ${g}, ${b}`;
+
+        if (color !== lastColor) {
+            if (lastColor !== null) html += '</span>';
+            html += `<span style="color:rgb(${color})">`;
+            lastColor = color;
         }
-        line += "<br>"; //Al final de cada fila agrega un salto de linea
+        
+        html += char;
+
+        if ((i+1) % width === 0) {
+            html += '</span>\n';
+            lastColor = null;
+        }
+    }
+    html += '</pre>'
+    container.innerHTML = html; //Agrega el ascii al container
+}
+
+function drawAsciiMonochromatic() {
+    const SCALE_Y = 0.5; //Escala en vertical para tener en cuenta que los caracteres tienen mas alto que ancho
+
+    const scale = Math.min(1, Number(MAX_WIDTH) / img.width); //Calcula la escala
+
+    const width = Math.floor(img.width * scale); //Valor de ancho
+    const height = Math.floor(img.height * scale * SCALE_Y); //Valor de alto
+
+
+    //Aplica las escalas al canvas
+    canvas.width = width; 
+    canvas.height = height;
+
+    ctx.drawImage(img, 0, 0, width, height); //Dibuja la imagen
+
+    imgData = ctx.getImageData(0, 0, width, height); //Toma la data de la imagen
+    const bw = returnPixelBWValueFromData(imgData); //Valores en ByN
+
+    let line = "";
+
+    for (let i = 0; i < bw.length; i++) {
+        line += returnAltasForValue(bw[i]) //Agregar a la linea el caracter correcto para esa posición
+        if ((i+1) % width === 0) {
+            line += "<br>";
+        }
     }
 
     container.innerHTML = line; //Agrega el ascii al container
@@ -326,7 +363,12 @@ function mostrarDialog(dialog) {
     }, 2200);
 }
 
-invertInput.oninput = () =>{
+invertColorInput.oninput = () =>{    
+    isColorInverted = invertColorInput.checked;
+    drawAscii();
+}
+
+invertCharsInput.oninput = () =>{
     reverseAtlas();
 }
 
@@ -342,4 +384,46 @@ function updateAtlasInput(){
     }
 }
 
+function posterizeImageData(imgData, bits=3){
+    const mask = 0xFF << (8 - bits);
+    const data = imgData.data;
+
+    for (let i = 0; i < data.length; i+=4) {
+        data[i] = data[i] & mask;
+        data[i+1] = data[i+1] & mask;
+        data[i+2] = data[i+2] & mask;
+
+
+    }
+}
 /**TODO: PERMITIR ASCII EN BASE A LOS COLORES DE LA IMAGEN */
+
+
+colorInput.oninput = () =>{
+    colorMode = colorInput.checked;
+    drawAscii();
+}
+
+function drawAscii() {
+    if (colorMode) {
+        drawAsciiColor();
+    } else{
+        drawAsciiMonochromatic();
+    }
+}
+
+function invertImg(imgData) {
+    let data = imgData.data;
+    for (let i = 0; i < data.length; i+=4) {
+        data[i] = 255 - data[i];
+        data[i+1] = 255 - data[i+1];
+        data[i+2] = 255 - data[i+2];
+    }
+}
+
+function downloadCanvas() {
+    const anchor = document.createElement('a');
+    anchor.download = "canvas.png";
+    anchor.href = canvas.toDataURL()
+    anchor.click();
+}
