@@ -52,11 +52,14 @@ widthInput.oninput = () =>{ //Cuando se modifica el slider de ancho
 window.onload = async () =>{ //Cuando carga la página
 
 
+    updateControls(); //Actualizar el estado del control de invertir colores
+
     const savedImage = await loadImageFromDB('image-loaded'); //Buscamos una imagen previa en IndexerDB
     if (savedImage) { //Si existe
         img.src = savedImage; //Cargamos la imagen
         img.onload = () => drawAscii(); //Al cargar, se dibuja
     }
+
 
     if (isColorInverted) { //Si los colores estan invertidos
         const width = canvas.width;
@@ -71,6 +74,7 @@ window.onload = async () =>{ //Cuando carga la página
     container.style.fontSize = fontSizeInput.value + "px"
     container.style.lineHeight = fontSizeInput.value + "px"
 }
+
 for (const input of characterInput.elements) { //Para cada input del atlas
     input.oninput = () => { //Al ingresar un valor
         //Mantener solo el primer caracter tipeado
@@ -258,11 +262,7 @@ function posterizeImageData(imgData, bits=3){
 colorInput.oninput = () =>{
     colorMode = colorInput.checked;
     drawAscii();
-    if (colorMode) {
-        invertColorControls.classList.remove("disabled");
-    }else{
-        invertColorControls.classList.add("disabled");
-    }
+    updateControls();
 }
 /**
  * Decide que funcion de dibujo utilizar en base al booleano colorMode
@@ -297,4 +297,12 @@ function downloadCanvas() {
     anchor.download = "canvas.png";
     anchor.href = canvas.toDataURL()
     anchor.click();
+}
+
+function updateControls() {
+    if (colorMode) {
+        invertColorControls.classList.remove("disabled");
+    }else{
+        invertColorControls.classList.add("disabled");
+    }    
 }
