@@ -50,6 +50,8 @@ widthInput.oninput = () =>{ //Cuando se modifica el slider de ancho
     }
 }
 window.onload = async () =>{ //Cuando carga la página
+
+
     const savedImage = await loadImageFromDB('image-loaded'); //Buscamos una imagen previa en IndexerDB
     if (savedImage) { //Si existe
         img.src = savedImage; //Cargamos la imagen
@@ -122,30 +124,10 @@ function returnAltasForValue(value) {
     return atlas[index] //Devuelve el caracter correcto del atlas
 }
 
-/**Pasa un array de 1D a uno de 2D
- * @param arr El array 1D
- * @param n Ancho del nuevo array
- * @param m Alto del nuevo array
- * @returns Array 2D
-*/
-function to2DArray(arr, n, m) {
-    if (arr.length !== n * m) {
-        throw new Error("Array size does not match dimensions");
-    }
-
-    const result = [];
-
-    for (let row = 0; row < m; row++) {
-        result.push(arr.slice(row * n, row * n + n));
-    }
-
-    return result;
-}
-
 /**
  * Funcion para dibujar en ASCII a Color
  */
-function drawAscii() {
+function drawAsciiColor() {
     const SCALE_Y = 0.5; //Escala en vertical para tener en cuenta que los caracteres tienen mas alto que ancho
 
     const scale = Math.min(1, Number(MAX_WIDTH) / img.width); //Calcula la escala
@@ -222,15 +204,19 @@ function drawAsciiMonochromatic() {
         if ((i+1) % width === 0) { //Si llega al final de la linea
             line += "<br>"; //Agregar salto de pagina
         }
-        line += "\n"; //Al final de cada fila agrega un salto de linea
     }
 
-    container.textContent = line; //Agrega el ascii al container
+    container.innerHTML = line; //Agrega el ascii al container
 }
 
 
 
-invertInput.oninput = () =>{
+invertColorInput.oninput = () =>{    
+    isColorInverted = invertColorInput.checked;
+    drawAscii();
+}
+
+invertCharsInput.oninput = () =>{
     reverseAtlas();
 }
 
