@@ -8,6 +8,10 @@ const downloadPNGButton = document.getElementById("download-png");
 const downloadSVGButton = document.getElementById("download-svg");
 const copyASCII = document.getElementById("copy-to-clipboard");
 const copyDialog = document.getElementById("copy-dialog");
+const colorInput = document.getElementById("monochrome-input");
+const invertColorControls = document.getElementById('invert-color-controls');
+const invertColorInput = document.getElementById("invert-color-input");
+const invertCharsInput = document.getElementById("invert-chars-input");
 const canvas = document.createElement('canvas');
 const container = document.getElementById("container");
 const ctx = canvas.getContext('2d');
@@ -16,7 +20,9 @@ let atlas = ["@", "%", "+", "=", "/", "-", ".", " "]; //ATLAS DE CARACTERES
 let img = new Image(); //Imagen
 let imgData; //imgData global vacio
 let MAX_WIDTH = widthInput.value; // Tamaño de la imagen del canvas
-const invertInput = document.getElementById("invert-input");
+
+let colorMode = colorInput.checked; //Modo de color
+let isColorInverted = invertColorInput.checked; //Colores invertidos
 
 imageInput.oninput = async () =>{ //Cuando el usuario sube una imagen
     const file = imageInput.files[0]; //Tomamos el archivo
@@ -50,11 +56,18 @@ window.onload = async () =>{ //Cuando carga la página
         img.onload = () => drawAscii(); //Al cargar, se dibuja
     }
 
-    updateAtlasInput();
-
+    if (isColorInverted) { //Si los colores estan invertidos
+        const width = canvas.width;
+        const height = canvas.height
+        imgData = ctx.getImageData(0, 0, width, height); //Toma la data de la imagen
+        invertImg(imgData); //Invierte los colores
+        reverseAtlas(); //Invierte el atlas
+    }
     //Se cargan los valores de los sliders a sus output label
     widthOutput.textContent = widthInput.value + " caracteres"; 
     fontSizeOutput.textContent = fontSizeInput.value + "px";
+    container.style.fontSize = fontSizeInput.value + "px"
+    container.style.lineHeight = fontSizeInput.value + "px"
 }
 for (const input of characterInput.elements) { //Para cada input del atlas
     input.oninput = () => { //Al ingresar un valor
@@ -87,6 +100,21 @@ function returnPixelBWValueFromData(imgData) {
     return pixels //Devuelve el array de pixeles
 }
 
+/**
+ * Devuelve el valor [R, G, B] de la imagen
+ * @param {*} imgData 
+ * @returns Array de pixeles
+ */
+function returnPixelColorValue(imgData) {
+    let data = imgData.data; //RGB de la imagen
+    let pixels = []; //Array vacio de pixeles
+    for (let i = 0; i < data.length; i+=4) { //Cada 4 valores
+        pixels.push([data[i], data[i+1], data[i+2]]) //Agrega los primeros 3 al array de pixeles (Omite transparencia)
+        
+    }
+    return pixels //Devuelve el array de pixeles
+}
+
 /**Devuelve el caracter correcto dependiendo del valor del pixel */
 function returnAltasForValue(value) {
     let possiblePositions = atlas.length; //Total de elementos en el atlas
@@ -115,7 +143,7 @@ function to2DArray(arr, n, m) {
 }
 
 /**
- * Funcion para dibujar en ASCII
+ * Funcion para dibujar en ASCII a Color
  */
 function drawAscii() {
     const SCALE_Y = 0.5; //Escala en vertical para tener en cuenta que los caracteres tienen mas alto que ancho
@@ -132,15 +160,67 @@ function drawAscii() {
 
     ctx.drawImage(img, 0, 0, width, height); //Dibuja la imagen
 
-    const imgData = ctx.getImageData(0, 0, width, height); //Toma la data de la imagen
+    imgData = ctx.getImageData(0, 0, width, height); //Toma la data de la imagen
+    if (isColorInverted) invertImg(imgData);
+    posterizeImageData(imgData, 3);
+    ctx.putImageData(imgData, 0, 0);
+    const bw = returnPixelBWValueFromData(imgData); //Valores en ByN para decidir el caracter
+    const colors = returnPixelColorValue(imgData); //Valores a color para pintar el caracter
 
-    const pixelsValues = returnPixelBWValueFromData(imgData); //Valores en ByN
-    const array2D = to2DArray(pixelsValues, width, height); //Valores en ByN hechos array 2D
+    let html = '' //String vacia para llenar con html
+    let lastColor = null; //Color anterior para decidir si crear un nuevo span
 
-    let line = ""; //String de linea
-    for (let y = 0; y < height; y++) { //Por cada fila
-        for (let x = 0; x < width; x++) { //Y cada columna
-            line += returnAltasForValue(array2D[y][x]); //Agregar a la linea el caracter correcto para esa posición
+    for (let i = 0; i < bw.length; i++) { //Por cada valor blanco y negro
+        const char = returnAltasForValue(bw[i]); //Elegir el caracter correcto del atlas 
+        //Setear los valores de color
+        const [r, g, b] = colors[i]; 
+        const color = `${r}, ${g}, ${b}`;
+
+        //Si el color actual es diferente al color del caracter anterior
+        if (color !== lastColor) {
+            //Si no es nulo cerrar el span anterior
+            if (lastColor !== null) html += '</span>'; 
+            html += `<span style="color:rgb(${color})">`; //Agregar un span con el color correspondiente
+            lastColor = color; //Setear lastColor al color actual
+        }
+        
+        html += char; //Agregar el caracter correspondiente
+
+        if ((i+1) % width === 0) { //Si esta al final de la linea 
+            html += '</span>\n'; //Cerrar el span y agregar salto de pagina
+            lastColor = null; //Devolver lastColor a ser nulo
+        }
+    }
+    container.innerHTML = html; //Agrega al container
+}
+
+/**
+ * Funcion para dibujar en ASCII monocromatico
+ */
+function drawAsciiMonochromatic() {
+    const SCALE_Y = 0.5; //Escala en vertical para tener en cuenta que los caracteres tienen mas alto que ancho
+
+    const scale = Math.min(1, Number(MAX_WIDTH) / img.width); //Calcula la escala
+
+    const width = Math.floor(img.width * scale); //Valor de ancho
+    const height = Math.floor(img.height * scale * SCALE_Y); //Valor de alto
+
+
+    //Aplica las escalas al canvas
+    canvas.width = width; 
+    canvas.height = height;
+
+    ctx.drawImage(img, 0, 0, width, height); //Dibuja la imagen
+
+    imgData = ctx.getImageData(0, 0, width, height); //Toma la data de la imagen
+    const bw = returnPixelBWValueFromData(imgData); //Valores en ByN
+
+    let line = ""; //Linea vacía
+
+    for (let i = 0; i < bw.length; i++) { //Por cada valor blanco y negro
+        line += returnAltasForValue(bw[i]) //Agregar a la linea el caracter correcto para esa posición
+        if ((i+1) % width === 0) { //Si llega al final de la linea
+            line += "<br>"; //Agregar salto de pagina
         }
         line += "\n"; //Al final de cada fila agrega un salto de linea
     }
@@ -148,171 +228,7 @@ function drawAscii() {
     container.textContent = line; //Agrega el ascii al container
 }
 
-/**METODOS PARA GUARDAR EL ASCII */
 
-let font = "24px monospace"
-let lineHeight = 24;
-
-/**Guarda el ASCII como PNG*/
-function saveAsciiAsImage() {
-    let art = container.textContent; //Texto ASCII
-
-    const saveCanvas = document.createElement('canvas'); //Crea un offscreen canvas
-    const saveCTX = saveCanvas.getContext('2d'); //Contexto
-
-    saveCTX.font = font; //Setea la fuente
-
-    const lines = art.split('\n'); //Separa las lineas con los saltos de pagina
-    let maxWidth = 0; //Ancho máximo vacio
-    lines.forEach(line =>{ //Por cada linea
-        const metrics = saveCTX.measureText(line) //Mide el ancho
-        if (metrics.width > maxWidth) { //Si es mayor que el valor de ancho previo
-            maxWidth = metrics.width; //Setea el valor al ancho de la linea
-        }
-    });
-
-    saveCanvas.width = maxWidth; //Setea el canvas al ancho maximo de las lineas
-    saveCanvas.height = lines.length * lineHeight; //El alto a la cantidad de lineas * el interlineado
-
-    saveCTX.fillStyle = '#ffffff00'; //Fondo transparente
-    saveCTX.fillRect(0, 0, saveCanvas.width, saveCanvas.height); //Llena el canvas
-    saveCTX.fillStyle = '#000000'; //Color negro
-    saveCTX.font = font; //Re-setea la fuente (No estoy seguro por qué es necesario pero sino la imagen se corta o se salta los espacios)
-
-    lines.forEach((line, index) =>{ //Para cada linea
-        saveCTX.fillText(line, 0, 0 + (index +1) * lineHeight); //Rellena el texto en su posición correspondiente
-    });
-
-    const image = saveCanvas.toDataURL('image/png'); //Guarda el canvas como base64
-    const link = document.createElement('a'); //Crea un offscreen anchor
-    link.download = 'ascii-arts.png'; //Setea el nombre de descarga
-    link.href = image; //El href como la imagen
-    link.click(); //Clickea el link, descargando la imagen
-
-    //Borra el offscreen canvas
-    saveCanvas.remove();
-}
-
-downloadPNGButton.onclick = () =>{
-    saveAsciiAsImage();
-}
-downloadSVGButton.onclick = () =>{
-    saveAsciiSvg();
-}
-/**Guardar el ASCII como svg */
-function saveAsciiSvg() {
-    let art = container.textContent; //Texto ASCII
-    let svg = document.createElement('svg') //Crea un offscreen SVG
-
-    const lines = art.split('\n'); //Separa las lineas con los saltos de página
-     
-    //Setea la fuente y el whiteSpace a pre
-    svg.style.font = font;
-    svg.style.whiteSpace = "pre";
-
-    
-    lines.forEach((line, i) =>{ //Para cada linea
-        let textLine = document.createElement('text'); //Crea un elemento text
-        textLine.textContent = line; //Rellena con el texto
-        textLine.setAttribute('x', 0); //Posiciona la x en 0
-        textLine.setAttribute('y', lineHeight*(i+1)); //La altura es el interlineado * la linea actual
-        textLine.setAttribute('xml:space', "preserve"); //Necesario para mantener los espacios intactos
-        textLine.setAttribute('font-family', "monospace"); //Setea la fuente a monoespaciada
-        svg.appendChild(textLine); //Agrega el elemento al svg
-    });
-
-    let lineWidth = lines[0].length * (lineHeight * 0.6); //Calcula mas o menos el ancho de la linea en base a una fuente monoespaciada
-
-    //Traer el html del svg
-    var serializer = new XMLSerializer();
-    var source = serializer.serializeToString(svg);
-
-    //Reemplaza el XML namespace por el de svg
-    source = source.replace(
-      /<svg\b([^>]*)xmlns="http:\/\/www\.w3\.org\/1999\/xhtml"/,
-      '<svg xmlns="http://www.w3.org/2000/svg"'
-    );
-    //Setea la vesion correcta
-    if (!source.match(/<svg[^>]*\bversion="/)) {
-      source = source.replace(
-        /<svg\b/,
-        '<svg version="1.1"'
-      );
-    }
-    //Setea la viewbox en base al ancho de linea y la altura
-    if (!source.match(/<svg[^>]*\bviewBox="/)) {
-      source = source.replace(
-        /<svg\b/,
-        `<svg viewBox="0 0 ${lineWidth} ${lineHeight*lines.length}"`
-      );
-    }
-    //Convertir el SVG a URI
-    var url = "data:image/svg+xml;charset=utf-8,"+ encodeURIComponent(source);
-
-    
-    const link = document.createElement('a'); //Crea offscreen anchor
-    link.download = 'ascii-arts.svg'; //Nombre del archivo
-    link.href = url; //El href como la imagen
-    link.click(); //Clickea el link, descargando la imagen
-}
-
-/**Funcion fallback para copiar el texto */
-function fallbackCopyTextToClipboard() {
-
-    container.focus(); //Focus en el container
-    container.select(); //Lo selecciona
-    try {
-      var successful = document.execCommand('copy'); //Intenta copiar ejecutando el comando copy
-      var msg = successful ? 'successful' : 'unsuccessful'; //Carga el mensaje dependiendo de si funcionó el comando
-      console.log('Fallback: Copying text command was ' + msg); //Da feedback en la consola
-    } catch (err) { //Si algo salió mal 
-      console.error('Fallback: Oops, unable to copy', err); //Da feedback en la consola
-    }
-}
- /**Funcion para copiar el texto */
-function copyTextToClipboard() {
-    let art = container.textContent; //Toma el texto del container
-    if (!navigator.clipboard) { //Si no tiene la funcionalidad clipboard
-      fallbackCopyTextToClipboard(art); //Usa la funcion de fallback
-      return; //Sale de la función actual
-    }
-    //Sino
-    navigator.clipboard.writeText(art).then(function() { //Pasa el texto al clipboard
-      console.log('Async: Copying to clipboard was successful!'); //Da feedback exitoso
-      showCopyStatus(true) //Activa el dialogo exitoso
-    }, function(err) { //Si falla
-      console.error('Async: Could not copy text: ', err); //Da feedback de fallo
-      showCopyStatus(false)//Activa el dialogo de fallo
-    });
-}
-
-copyASCII.onclick = () =>{
-    copyTextToClipboard();
-}
-
-/**Muestra el status de la acción de copiar
- * @param copied Booleano
- */
-function showCopyStatus(copied){
-    if (copied) { //Si copio correctamente
-        copyDialog.textContent = "¡ASCII copiado correctamente!" //Cambia el texto del dialog
-        mostrarDialog(copyDialog); //Lo muestra
-    }else{ //Sino
-        copyDialog.textContent = "Algo salió mal :(" //Cambia el texto del dialog
-        mostrarDialog(copyDialog); //Lo muestra
-    }
-}
-/**Mostrar el dialog */
-function mostrarDialog(dialog) {
-    dialog.show(); //Lo muestra
-    dialog.style.opacity = "1"; //Activa la opacidad
-    setTimeout(() => { //Timeout para esconderlo
-        dialog.style.opacity = "0"; //Quita la opacidad
-    }, 2000);
-    setTimeout(() => {//Timeout para cerrarlo
-        dialog.close() //Lo cierra
-    }, 2200);
-}
 
 invertInput.oninput = () =>{
     reverseAtlas();
@@ -324,10 +240,75 @@ function reverseAtlas(){
     drawAscii();
 }
 
+/**
+ * Actualiza las inputs de atlas en base al atlas actual en memoria
+ */
 function updateAtlasInput(){
     for (let i = 0; i < characterInput.elements.length; i++) { //Se carga el atlas a las inputs de atlas
         characterInput.elements[i].value = atlas[i]
     }
 }
 
-/**TODO: PERMITIR ASCII EN BASE A LOS COLORES DE LA IMAGEN */
+/**
+ * Posteriza los datos de imagen reduciendo la profundidad de colores
+ * @param {*} imgData De un contexto canvas
+ * @param {*} bits Numero entero de bits por canal (Por defecto 3)
+ */
+function posterizeImageData(imgData, bits=3){
+
+    const mask = 0xFF << (8 - bits); //Bitmask que retiene los bits superiores del valor de color
+    const data = imgData.data; //Toma los valores rgb de la imagen
+
+    for (let i = 0; i < data.length; i+=4) { //Cada 4 valores
+        //Aplica la mascara al canal correspondiente
+        data[i] = data[i] & mask; //R
+        data[i+1] = data[i+1] & mask; //G
+        data[i+2] = data[i+2] & mask; //B
+
+
+    }
+}
+
+colorInput.oninput = () =>{
+    colorMode = colorInput.checked;
+    drawAscii();
+    if (colorMode) {
+        invertColorControls.classList.remove("disabled");
+    }else{
+        invertColorControls.classList.add("disabled");
+    }
+}
+/**
+ * Decide que funcion de dibujo utilizar en base al booleano colorMode
+ */
+function drawAscii() {
+    if (colorMode) { //Si esta en modo color
+        drawAsciiColor(); //Llama la funcion de dibujar con color
+    } else{ //Sino
+        drawAsciiMonochromatic(); //Llama la funcion de dibujar en monocromatico
+    }
+}
+
+/**
+ * Funcion para invertir los colores del canvas
+ * @param {*} imgData De un contexto canvas
+ */
+function invertImg(imgData) {
+    let data = imgData.data; //Toma los valores rgb de la imagen
+    for (let i = 0; i < data.length; i+=4) { //Cada 4 valores
+        //Resta 255 - el valor actual del canal correspondiente, invirtiendo el color
+        data[i] = 255 - data[i]; //R
+        data[i+1] = 255 - data[i+1]; //G
+        data[i+2] = 255 - data[i+2]; //B
+    }
+}
+
+/**
+ * Funcion de debug para descargar el canvas actual
+ */
+function downloadCanvas() {
+    const anchor = document.createElement('a');
+    anchor.download = "canvas.png";
+    anchor.href = canvas.toDataURL()
+    anchor.click();
+}

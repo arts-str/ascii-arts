@@ -95,6 +95,13 @@ html, body{
     opacity: 1;
 }
 
+.disabled {
+    display: none;
+}
+.image-control{
+    display: flex;
+    gap: 1rem;
+}
 @media screen and (max-width: 768px) {
     input[type='range']{
         height:10px; 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Img-to-ASCII</title>
+    <title>ASCII-ARTS</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
@@ -51,9 +51,22 @@
                 <button type="button" id="download-svg">Descargar SVG</button>
                 <button type="button" id="copy-to-clipboard">Copiar ASCII</button>
             </fieldset>
-            <fieldset>
-                <legend>Invert image</legend>
-                <input id="invert-input" type="checkbox">
+            <fieldset class="image-control">
+                <legend>Control de imagen</legend>
+                <div>
+                    <label for="invert-chars-input">Invertir imagen</label>
+                    <input id="invert-chars-input" type="checkbox">
+
+                </div>
+                <div>
+                    <label for="monochrome-input">Color</label>
+                    <input id="monochrome-input" type="checkbox" checked>
+
+                </div>
+                <div id="invert-color-controls" class="disabled">
+                    <label for="invert-color-input">Invertir colores</label>
+                    <input id="invert-color-input" type="checkbox">
+                </div>
             </fieldset>
         </form>
         <pre id="container"></pre>
@@ -63,5 +76,6 @@
     <script src="js/styleControls.js"></script>
     <script src="js/script.js"></script>
     <script src="js/events.js"></script>
+    <script src="js/saveASCII.js"></script>
 </body>
 </html>
