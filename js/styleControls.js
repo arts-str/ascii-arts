@@ -9,16 +9,14 @@ controlHeader.onclick = () =>{
 /**
  * Activa un mensaje de advertencia al usuario cuando el valor del arte ascii es mayor que el ancho de la imagen original
  */
-function activateWidthWarning(msg) {
-    if (img.width < Number(widthInput.value)) {
-            widthOutput.parentElement.classList.add('warning');
-            widthOutput.parentElement.children[0].classList.add('warning');
+function activateWidthWarning(msg, condition) {
+    if (condition) {
+            widthWarning.parentElement.classList.add('warning');
             widthWarning.textContent = msg;
             widthWarning.classList.remove('inactive');
         }else{
             widthWarning.classList.add('inactive');
             widthWarning.textContent = '';
-            widthOutput.parentElement.children[0].classList.remove('warning');
-            widthOutput.parentElement.classList.remove('warning');
+            widthWarning.parentElement.classList.remove('warning');
         }
 }

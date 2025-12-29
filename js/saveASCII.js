@@ -74,12 +74,6 @@ function saveAsciiAsImage() {
     saveCanvas.remove();
 }
 
-downloadPNGButton.onclick = () =>{
-    saveAsciiAsImage();
-}
-downloadSVGButton.onclick = () =>{
-    saveAsciiSvg();
-}
 /**Guardar el ASCII como svg */
 function saveAsciiSvg() {
     let art = container.innerHTML; //Texto ASCII
@@ -175,4 +169,21 @@ function saveAsciiSvg() {
     link.download = 'ascii-arts.svg'; //Nombre del archivo
     link.href = url; //El href como la imagen
     link.click(); //Clickea el link, descargando la imagen
+}
+
+downloadPNGButton.onclick = () =>{
+    saveAsciiAsImage();
+}
+downloadSVGButton.onclick = () =>{
+    saveAsciiSvg();
+}
+
+/**
+ * Funcion de debug para descargar el canvas actual
+ */
+function downloadCanvas() {
+    const anchor = document.createElement('a');
+    anchor.download = "canvas.png";
+    anchor.href = canvas.toDataURL()
+    anchor.click();
 }
