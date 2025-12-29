@@ -1,37 +1,67 @@
-const sliders = document.querySelectorAll('input[type=range]'); //Todos los sliders en la pagina
+const sliders = document.querySelectorAll('input[type=range]');
 
-
-for (const slider of sliders) { //Para cada uno
-    let space = slider.max - slider.min; //Rango numerico
-    
-    
-    slider.onmouseover = () =>{ //Cuando se hace hover
-        for (const element of sliders) { //Por cada elemento que este en focus
-            element.blur(); //Quita focus
-        }
-        slider.onwheel = (e) =>{ //Al girar la rueda del mouse
-            e.preventDefault(); //Previene que la pagina scrollee
-            slider.value -= Math.round((space/e.deltaY*5)); //Al valor actual se le quita la cantidad scrolleada, con esta ecuacion todos los sliders bajan la misma cantidad independientemente de sus min y max
-            slider.dispatchEvent( new Event('input')) //Despacha un evento input para el resto de la funcionalidad del slider.
-        }
-        
-    } 
-    const onWheel = (e) => {
-        e.preventDefault();
-        slider.value -= Math.round(space / e.deltaY * 5);
-        slider.dispatchEvent(new Event('input'));
-    };
-
-    slider.onfocus = () => { //Al hacer foco
-        document.addEventListener('wheel', onWheel, { passive: false }); //Agrega el evento de rueda 
-    };
-
-    slider.onblur = () => { //Al quitar foco
-        document.removeEventListener('wheel', onWheel); //Quita el evento de rueda
-    };
-
-
+function debounce(func, timeout = 300) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func.apply(this, args);
+    }, timeout);
+  };
 }
+
+for (const slider of sliders) {
+  let space = slider.max - slider.min;
+
+  // Function to immediately update the slider value smoothly
+  const updateSliderValue = (e) => {
+    slider.value -= Math.round((space / e.deltaY) * 5);
+  };
+
+  // Function to dispatch the input event after debounce
+  const dispatchInputEvent = debounce(() => {
+    slider.dispatchEvent(new Event('input'));
+  }, 300); // Adjust the debounce timeout as needed
+
+  slider.onmouseover = () => {
+    for (const element of sliders) {
+      element.blur();
+    }
+
+    slider.onwheel = (e) => {
+      e.preventDefault();
+      
+      // Update the slider's value immediately for smooth motion
+      updateSliderValue(e);
+     e.target.nextElementSibling.textContent = e.target.nextElementSibling.textContent.replace(/(\d+)/, e.target.value);
+
+      
+      
+      // Dispatch the input event after the debounce
+      dispatchInputEvent();
+    };
+  };
+
+  slider.onmouseout = () => {
+    slider.onmouseover = () => {};
+  };
+
+  const onWheel = debounce((e) => {
+    e.preventDefault();
+    updateSliderValue(e);
+    dispatchInputEvent();
+  }, 300);
+
+  slider.onfocus = () => {
+    document.addEventListener('wheel', onWheel, { passive: false });
+  };
+
+  slider.onblur = () => {
+    document.removeEventListener('wheel', onWheel);
+  };
+}
+
+
 
 /**Funcion fallback para copiar el texto */
 function fallbackCopyTextToClipboard() {
@@ -91,4 +121,21 @@ function mostrarDialog(dialog) {
     setTimeout(() => {//Timeout para cerrarlo
         dialog.close() //Lo cierra
     }, 2200);
+}
+
+for (const input of characterInput.elements) { //Para cada input del atlas
+    input.oninput = () => { //Al ingresar un valor
+        //Mantener solo el primer caracter tipeado
+        input.value = input.value.slice(0, 1);
+
+        //Busca la posición del caracter
+        const position = [...characterInput.elements].indexOf(input);
+
+        //Si la input esta vacía, usar un espacio, sino rellenar con el valor de la input
+        atlas[position] = input.value === "" ? " " : input.value;
+
+        if (img.src !== "") { //Si la imagen no esta vacía
+            drawAscii(); //Re-Dibujar
+        }
+    };
 }

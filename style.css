@@ -23,6 +23,9 @@ html, body{
     background-color: var(--bg);
     color: var(--fg);
     touch-action: manipulation;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 #container{
@@ -33,25 +36,20 @@ html, body{
     line-height: 5px;
     letter-spacing: unset;
     transform: unset;
-    background-color: var(--art-bg);
     color: var(--art-fg);
-    width: fit-content;
+    height: 100dvh;
+    text-align: center;
 }
 .controls{
     display: flex;
     flex-direction: column;
     width: fit-content;
     position: fixed;
-    background-color: var(--bg);
-    mix-blend-mode: difference;
+    background-color: #000000aa;
     bottom: 0;
     right: 0;
     transition: transform 200ms ease-in;
     padding-left: 1rem;
-}
-
-.controls:has(fieldset:hover){
-    mix-blend-mode: normal;
 }
 
 .warning{
@@ -78,9 +76,8 @@ html, body{
     display: flex;
     align-items: center;
 }
-#controls-header h3{
-    margin-right: .5rem;
-    margin-top: .5rem;
+#controls-header h3, #controls-header svg{
+    margin: .5rem .5rem 2rem 0;
 }
 #controls-header svg{
     transition: rotate 200ms ease-in;
@@ -102,12 +99,13 @@ html, body{
     opacity: 1;
 }
 
-.disabled {
-    display: none;
-}
 .image-control{
     display: flex;
     gap: 1rem;
+}
+
+label{
+    user-select: none;
 }
 @media screen and (max-width: 768px) {
     input[type='range']{

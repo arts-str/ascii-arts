@@ -2,7 +2,6 @@ const imageInput = document.getElementById("image-input");
 const widthInput = document.getElementById("width-input");
 const widthOutput= document.getElementById("width-output");
 const widthWarning = document.getElementById("width-warning");
-const fontSizeOutput = document.getElementById("font-size-output");
 const characterInput = document.getElementById("character-inputs");
 const downloadPNGButton = document.getElementById("download-png");
 const downloadSVGButton = document.getElementById("download-svg");
@@ -12,6 +11,7 @@ const colorInput = document.getElementById("monochrome-input");
 const invertColorControls = document.getElementById('invert-color-controls');
 const invertColorInput = document.getElementById("invert-color-input");
 const invertCharsInput = document.getElementById("invert-chars-input");
+const controls = document.getElementById('controls');
 const canvas = document.createElement('canvas');
 const container = document.getElementById("container");
 const ctx = canvas.getContext('2d');
@@ -27,40 +27,75 @@ let isColorInverted = invertColorInput.checked; //Colores invertidos
 imageInput.oninput = async () =>{ //Cuando el usuario sube una imagen
     const file = imageInput.files[0]; //Tomamos el archivo
     if (!file) return; //Si cancela la operación salimos de la funcion
-
+    
     READER.onload = async (e) =>{ //Al cargar el lector
         img.src = e.target.result; //La fuente de la imagen es el resultado del lector
         await saveImageToDB('image-loaded', e.target.result); //Se guarda con IndexerDB para mantener la imagen entre sesiones
     }
 
     img.onload = () => { //Al cargar la imagen
+        
         drawAscii(); //Dibujar
+        updateContainerFont(); //Actualizar el tamaño de fuente del container para no generar overflow
+        setResolutionToImageWidth(); //Setear el valor maximo del slider de resolucion
     };
 
     READER.readAsDataURL(file); //Leer la imagen con el lector y pasarla a base64
 }
 widthInput.oninput = () =>{ //Cuando se modifica el slider de ancho
-    MAX_WIDTH = Number(widthInput.value); //Modificar el valor de MAX_WIDTH
     
+    MAX_WIDTH = Number(widthInput.value); //Modificar el valor de MAX_WIDTH
     widthOutput.textContent = widthInput.value + " caracteres"; //Modificar el texto que muestra el valor de ancho
-
     if (img.src != "") { //Si la imagen no está vacía
-        activateWidthWarning(); //Da un feedback al usuario si el valor es mayor que el ancho de la imagen
+        activateWidthWarning('¡La resolución de la imagen es muy pequeña!'); //Da un feedback al usuario si el valor es mayor que el ancho de la imagen
         drawAscii(); //Re-Dibuja
     }
+    updateContainerFont() //Actualizar el tamaño de fuente del container para no generar overflow
 }
+/**Actualiza los valores para calcular el tamaño de fuente correcto */
+function updateFontSizeValues() {
+    const rows = colorMode ? container.innerHTML.split('\n').length : container.innerHTML.split('<br>').length; //Difiere la manera de leer la cantidad de lineas si esta en modo color o no
+    const viewportHeight = window.innerHeight; //Altura del viewport
+    return [viewportHeight, rows] //Devuelve los valores
+}
+/**Calcula el tamaño de fuente correcto para que entre en el viewport */
+function calculateFontSizeExact() {
+    let [viewportHeight, rows] = updateFontSizeValues(); //Llama la funcion para actualizar los valores
+    let size = viewportHeight / rows; //Hace el calculo
+    return size; //Lo devuelve
+}
+/**Actualiza el tamaño de fuente del container */
+function updateContainerFont() {
+    container.style.fontSize = calculateFontSizeExact() + "px" //Actualiza el valor de fuente con el valor correcto
+    container.style.lineHeight = calculateFontSizeExact() + "px"; //Actualiza el valor de interlineado con el valor correcto
+}
+/**Setea la propiedad max del slider de resolucion al valor del ancho de la imagen si este es menor a 500 */
+function setResolutionToImageWidth() {
+    if (img.width < 500) { //Si el ancho de la imagen es menor a 500
+        widthInput.setAttribute('max', img.width); //Setea el valor maximo del slider al ancho de la imagen        
+    }else{ //Sino
+        widthInput.setAttribute('max', 500); //Setea el valor maximo del slider a 500
+    }
+    
+    widthOutput.textContent = widthInput.value + ' caracteres';
+}
+
 window.onload = async () =>{ //Cuando carga la página
 
-
-    updateControls(); //Actualizar el estado del control de invertir colores
+    updateControlsBackgroundColor();
+    updateInvertControlsVisibility(); //Actualizar el estado del control de invertir colores
 
     const savedImage = await loadImageFromDB('image-loaded'); //Buscamos una imagen previa en IndexerDB
     if (savedImage) { //Si existe
         img.src = savedImage; //Cargamos la imagen
-        img.onload = () => drawAscii(); //Al cargar, se dibuja
+        img.onload = () => { //Al cargar la imagen
+            drawAscii() //Dibujar imagen
+            updateContainerFont() //Actualizar el tamaño de fuente del container para no generar overflow
+            setResolutionToImageWidth(); //Setear el valor maximo del slider de resolucion
+        }; //Al cargar, se dibuja
     }
 
-
+    updateAtlasInput()
     if (isColorInverted) { //Si los colores estan invertidos
         const width = canvas.width;
         const height = canvas.height
@@ -70,27 +105,9 @@ window.onload = async () =>{ //Cuando carga la página
     }
     //Se cargan los valores de los sliders a sus output label
     widthOutput.textContent = widthInput.value + " caracteres"; 
-    fontSizeOutput.textContent = fontSizeInput.value + "px";
-    container.style.fontSize = fontSizeInput.value + "px"
-    container.style.lineHeight = fontSizeInput.value + "px"
+    
 }
 
-for (const input of characterInput.elements) { //Para cada input del atlas
-    input.oninput = () => { //Al ingresar un valor
-        //Mantener solo el primer caracter tipeado
-        input.value = input.value.slice(0, 1);
-
-        //Busca la posición del caracter
-        const position = [...characterInput.elements].indexOf(input);
-
-        //Si la input esta vacía, usar un espacio, sino rellenar con el valor de la input
-        atlas[position] = input.value === "" ? " " : input.value;
-
-        if (img.src !== "") { //Si la imagen no esta vacía
-            drawAscii(); //Re-Dibujar
-        }
-    };
-}
 /**
  * Devuelve el valor ByN de la imagen
  * @param {*} imgData Objeto de datos de imagen
@@ -259,10 +276,17 @@ function posterizeImageData(imgData, bits=3){
     }
 }
 
+/**Updates the background color of the controls panel */
+function updateControlsBackgroundColor() {
+    container.style.background = colorMode ? '#ffffff00' : '#ffffff';
+    controls.style.background = colorMode ? '#ffffff00' : '#000000aa';
+}
+
 colorInput.oninput = () =>{
     colorMode = colorInput.checked;
+    updateControlsBackgroundColor()
     drawAscii();
-    updateControls();
+    updateInvertControlsVisibility();
 }
 /**
  * Decide que funcion de dibujo utilizar en base al booleano colorMode
@@ -299,10 +323,11 @@ function downloadCanvas() {
     anchor.click();
 }
 
-function updateControls() {
+/**Updates the invert control visibility */
+function updateInvertControlsVisibility() {
     if (colorMode) {
-        invertColorControls.classList.remove("disabled");
+        invertColorControls.classList.remove("inactive");
     }else{
-        invertColorControls.classList.add("disabled");
+        invertColorControls.classList.add("inactive");
     }    
 }
