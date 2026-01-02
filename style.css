@@ -66,6 +66,7 @@ html, body{
 .inactive{
     display: none;
 }
+
 #width-warning{
     font-size: smaller;
     font-style: italic;
@@ -124,6 +125,7 @@ label{
 }
 
 .input-card legend{
+    user-select: none;
     font-family: "Quantico";
     font-size: 12pt;
     font-weight: 400;
@@ -197,6 +199,9 @@ label{
     border: 2px solid currentColor;
     border-radius: none;
     text-align: center;
+}
+.input-card input[type="number"]:focus{
+    outline: 1px solid currentColor;
 }
 .input-card input[type="number"]::-webkit-inner-spin-button,
 .input-card input[type="number"]::-webkit-outer-spin-button{

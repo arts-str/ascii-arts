@@ -137,9 +137,9 @@ colorInput.oninput = () =>{
 /**Updates the invert control visibility */
 function updateInvertControlsVisibility() {
     if (colorMode) {
-        invertColorControls.classList.remove("inactive");
+        invertColorControls.style.visibility = "visible";
     }else{
-        invertColorControls.classList.add("inactive");
+        invertColorControls.style.visibility = "hidden";
     }    
 }
 
