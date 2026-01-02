@@ -38,15 +38,21 @@ html, body{
 .controls{
     display: flex;
     flex-direction: column;
-    width: 40%;
+    width: 30%;
     background-color: #000000aa;
     flex-shrink: 0;
     transition: transform 100ms ease-in;
+    padding: 1rem;
 }
+
 #controls-header{
     display: flex;
 }
 #controls-header h3{
+    font-family: "Quantico";
+    font-size: 16pt;
+    font-weight: 400;
+    line-height: 32px;
     user-select: none;
 }
 #controls-header svg{
@@ -89,7 +95,6 @@ html, body{
 .image-control{
     display: flex;
     flex-direction: column;
-    gap: 1rem;
 }
 
 label{
@@ -99,7 +104,7 @@ label{
 .input-card{
     border: 1px solid;
     border-radius: 5px; 
-    margin: 0;
+    margin-bottom: 1rem;
     padding: 0;
 }
 .card-items{
@@ -119,7 +124,10 @@ label{
 }
 
 .input-card legend{
-    font-weight: 600;
+    font-family: "Quantico";
+    font-size: 12pt;
+    font-weight: 400;
+    line-height: 32px;
     float: left;
     background-color: #1a1a1a;
     border-bottom: 1px solid var(--fg);
@@ -129,21 +137,65 @@ label{
     text-align: center;
 }
 
-.input-card input[type="range"]{
-    height:10px; 
+.input-card input[type="range"] {
+    appearance: none;
+    -webkit-appearance: none;
+
+    width: 100%;
+    height: 10px;
+
+    background-color: transparent;
+    border: 2px solid var(--fg);
+    box-shadow: inset 0 0 0 2px currentColor;
+
+    cursor: pointer;
 }
-.input-card input[type="range"]::-webkit-slider-thumb{
-    height:30px;
-    width:30px;
+
+/* track */
+.input-card input[type="range"]::-webkit-slider-runnable-track {
+    height: 10px;
 }
+
+.input-card input[type="range"]::-moz-range-track {
+    height: 10px;
+}
+
+/* thumb */
+.input-card input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+
+    width: 25px;
+    height: 25px;
+
+    background-color: var(--fg);
+    border-radius: 0;
+
+    margin-top: -7px;
+}
+
+.input-card input[type="range"]::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+
+    background-color: var(--fg);
+    border: none;
+    border-radius: 0;
+}
+
+/* focus cleanup */
+.input-card input[type="range"]:focus {
+    outline: none;
+}
+
 
 .input-card input[type="number"]{
     -moz-appearance: textfield;
     margin: 0;
     color: var(--fg);
     background-color: var(--bg);
-    border: 1px solid var(--fg);
-    border-radius: 5px;
+    border: 2px solid currentColor;
+    border-radius: none;
     text-align: center;
 }
 .input-card input[type="number"]::-webkit-inner-spin-button,
@@ -151,7 +203,12 @@ label{
     -webkit-appearance: none;
     margin: 0;
 }
-
+.input-card input[type="text"]{
+    border: 2px solid currentColor;
+}
+.input-card input[type="text"]:focus{
+    outline: 1px solid currentColor;
+}
 .input-card figure{
     padding: .3rem;
 }
@@ -159,6 +216,41 @@ label{
 .input-card input[type="file"]{
     display: none;
 }
+.input-card output{
+    user-select: none;
+}
+.input-card input[type="checkbox"] {
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    width: 17px;
+    height: 17px;
+
+    background-color: var(--bg);
+    border: 2px solid currentColor;
+    border-radius: none;
+    color: var(--fg);
+    position: relative;
+}
+
+.input-card input[type="checkbox"]::after {
+    content: "";
+    position: absolute;
+    inset: 3px;
+    background-color: transparent;
+}
+
+.input-card input[type="checkbox"]:checked::after {
+    background-color: var(--fg);
+}
+
+.image-control-options div{
+    margin: 0;
+    display: flex;
+}
+
 .file-upload{
     display: inline-block;
     background-image: url(img/upload.svg);
@@ -181,7 +273,6 @@ label{
     height: 32px;
     text-align: right;
     text-wrap-mode: nowrap;
-    background-color: var(--bg);
     color: var(--fg);
     font-family: "Hanken Grotesk", sans-serif;
     font-size: 16px;
@@ -191,27 +282,29 @@ label{
 .download-options{
     display: none;
     position: absolute;
-    transform: translate(8rem, -2.35rem);
+    transform: translate(100%, 25px);
     z-index: 1;
-    background-color: var(--bg);
     color: var(--fg);
+    transition: transform 100ms ease-in;
 }
 .download-options div{
     appearance: none;
-    padding: 1rem;
+    width: 7rem;
+    height: 32px;
     border-radius: 5px;
     margin: 0;
+    padding: .5rem;
+    background-color: var(--bg);
     border: 1px solid var(--fg);
 }
 .download-options div:hover{
-    background-color: #ffffff77;
+    background-color: #a7a7a7;
 
 }
 
 .file-download:hover div{
     font-family: "Hanken Grotesk", sans-serif;
     font-size: 16px;
-    border: none;
 }
 
 .copy-ascii{
@@ -236,10 +329,9 @@ label{
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1;
 }
 .button:hover{
-    background-color: #ffffff77;
+    background-color: #a7a7a7;
 }
 
 .button p{
@@ -259,7 +351,8 @@ label{
         flex-direction: column-reverse;
     }
     .controls{
-        width: 100%;
+        padding: 0;
+        width: 100dvw;
         position: absolute;
         bottom: 0;
     }
@@ -267,14 +360,8 @@ label{
         display: block;
     }
     .download-options{
-        transform: none;
+        transform: translate(0%, 75%);
     }
-    input[type='range']{
-        height:10px; 
-    }
-    input[type='range']::-webkit-slider-thumb{ 
-        height:30px;
-        width:30px;
-    } 
+
 }
 

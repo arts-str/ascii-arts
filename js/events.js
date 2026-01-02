@@ -50,18 +50,23 @@ for (const slider of sliders) {
     slider.onmouseover = () => {};
   };
 
-  const onWheel = debounce((e) => {
-    e.preventDefault();
-    updateSliderValue(e);
-    dispatchInputEvent();
-  }, 300);
-
   slider.onfocus = () => {
-    document.addEventListener('wheel', onWheel, { passive: false });
+    slider.onwheel = (e) => {
+      e.preventDefault();
+      
+      // Update the slider's value immediately for smooth motion
+      updateSliderValue(e);
+     e.target.nextElementSibling.textContent = e.target.nextElementSibling.textContent.replace(/(\d+)/, e.target.value);
+
+      
+      
+      // Dispatch the input event after the debounce
+      dispatchInputEvent();
+    };
   };
 
   slider.onblur = () => {
-    document.removeEventListener('wheel', onWheel);
+    slider.onwheel = (e) => {};
   };
 }
 
