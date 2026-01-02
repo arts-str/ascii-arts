@@ -1,6 +1,6 @@
 const imageInput = document.getElementById("image-input");
-const widthInput = document.getElementById("width-input");
-const widthOutput= document.getElementById("width-output");
+const widthInputSlider = document.getElementById("width-input-slider");
+const widthInputNumber = document.getElementById("width-input-number");
 const widthWarning = document.getElementById("width-warning");
 const characterInput = document.getElementById("character-inputs");
 const downloadPNGButton = document.getElementById("download-png");
@@ -19,7 +19,7 @@ const READER = new FileReader(); //Lector de archivos
 let atlas = ["@", "%", "+", "=", "/", "-", ".", " "]; //ATLAS DE CARACTERES
 let img = new Image(); //Imagen
 let imgData; //imgData global vacio
-let MAX_WIDTH = widthInput.value; // Tamaño de la imagen del canvas
+let MAX_WIDTH = widthInputSlider.value; // Tamaño de la imagen del canvas
 
 let colorMode = colorInput.checked; //Modo de color
 let isColorInverted = invertColorInput.checked; //Colores invertidos
@@ -36,7 +36,7 @@ window.onload = async () =>{ //Cuando carga la página
             drawAscii() //Dibujar imagen
             updateContainerFont() //Actualizar el tamaño de fuente del container para no generar overflow
             setResolutionToImageWidth(); //Setear el valor maximo del slider de resolucion
-            activateWidthWarning("Valores muy altos pueden causar que la pagina se realentice", widthInput.value > 200 && colorMode);
+            activateWidthWarning("Valores muy altos pueden causar que la pagina se realentice", widthInputSlider.value > 200 && colorMode);
         };
     }
 
@@ -48,8 +48,6 @@ window.onload = async () =>{ //Cuando carga la página
         invertImg(imgData); //Invierte los colores
         reverseAtlas(); //Invierte el atlas
     }
-    //Se cargan los valores de los sliders a sus output label
-    widthOutput.textContent = widthInput.value + " caracteres"; 
     
 }
 
@@ -67,23 +65,36 @@ imageInput.oninput = async () =>{ //Cuando el usuario sube una imagen
         drawAscii(); //Dibujar
         updateContainerFont(); //Actualizar el tamaño de fuente del container para no generar overflow
         setResolutionToImageWidth(); //Setear el valor maximo del slider de resolucion
-        activateWidthWarning("Valores muy altos pueden causar que la pagina se realentice", widthInput.value > 200 && colorMode);
+        activateWidthWarning("Valores muy altos pueden causar que la pagina se realentice", widthInputSlider.value > 200 && colorMode);
     };
 
     READER.readAsDataURL(file); //Leer la imagen con el lector y pasarla a base64
 }
-widthInput.oninput = () =>{ //Cuando se modifica el slider de ancho
+widthInputSlider.oninput = () =>{ //Cuando se modifica el slider de ancho
     
-    MAX_WIDTH = Number(widthInput.value); //Modificar el valor de MAX_WIDTH
-    widthOutput.textContent = widthInput.value + " caracteres"; //Modificar el texto que muestra el valor de ancho
+    
+    widthInputNumber.value = widthInputSlider.value;
+
+    MAX_WIDTH = Number(widthInputSlider.value); //Modificar el valor de MAX_WIDTH
     if (img.src != "") { //Si la imagen no está vacía
         activateWidthWarning('¡La resolución de la imagen es muy pequeña!'); //Da un feedback al usuario si el valor es mayor que el ancho de la imagen
         drawAscii(); //Re-Dibuja
     }
 
-    activateWidthWarning("Valores muy altos pueden causar que la pagina se realentice", widthInput.value > 200 && colorMode);
+    activateWidthWarning("Valores muy altos pueden causar que la pagina se realentice", widthInputSlider.value > 200 && colorMode);
 
     updateContainerFont() //Actualizar el tamaño de fuente del container para no generar overflow
+}
+
+widthInputNumber.oninput = () =>{
+    widthInputNumber.value = widthInputNumber.value.replace(/^[a-zA-Z]+$/, '');
+}
+
+widthInputNumber.onchange = () =>{
+    widthInputNumber.value = Math.min(widthInputNumber.value, widthInputNumber.max);
+    widthInputNumber.value = Math.max(widthInputNumber.value, widthInputNumber.min);
+    widthInputSlider.value = widthInputNumber.value;
+    widthInputSlider.dispatchEvent(new Event('input'));
 }
 
 invertColorInput.oninput = () =>{    
@@ -121,7 +132,7 @@ colorInput.oninput = () =>{
     updateControlsBackgroundColor()
     drawAscii();
     updateInvertControlsVisibility();
-    activateWidthWarning("Valores muy altos pueden causar que la pagina se realentice", widthInput.value > 200 && colorMode);
+    activateWidthWarning("Valores muy altos pueden causar que la pagina se realentice", widthInputSlider.value > 200 && colorMode);
 }
 
 /**Updates the invert control visibility */
@@ -153,10 +164,10 @@ function updateContainerFont() {
 /**Setea la propiedad max del slider de resolucion al valor del ancho de la imagen si este es menor a 500 */
 function setResolutionToImageWidth() {
     if (img.width < 500) { //Si el ancho de la imagen es menor a 500
-        widthInput.setAttribute('max', img.width); //Setea el valor maximo del slider al ancho de la imagen        
+        widthInputSlider.setAttribute('max', img.width);
+        widthInputNumber.setAttribute('max', img.width); //Setea el valor maximo del slider al ancho de la imagen        
     }else{ //Sino
-        widthInput.setAttribute('max', 500); //Setea el valor maximo del slider a 500
+        widthInputSlider.setAttribute('max', 500);
+        widthInputNumber.setAttribute('max', 500); //Setea el valor maximo del slider a 500
     }
-    
-    widthOutput.textContent = widthInput.value + ' caracteres';
 }

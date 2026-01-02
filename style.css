@@ -9,13 +9,6 @@
     font-weight: 400;
     font-style: normal;
 }
-
-.ascii-art{
-    font-family: monospace;
-    line-height: 1;
-    white-space: pre;
-    margin: 0;
-}
 html, body{
     margin: 0;
     padding: 0;
@@ -23,9 +16,11 @@ html, body{
     background-color: var(--bg);
     color: var(--fg);
     touch-action: manipulation;
+}
+
+.main-order{
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: row;
 }
 
 #container{
@@ -43,15 +38,21 @@ html, body{
 .controls{
     display: flex;
     flex-direction: column;
-    width: fit-content;
-    position: fixed;
+    width: 40%;
     background-color: #000000aa;
-    bottom: 0;
-    right: 0;
-    transition: transform 200ms ease-in;
-    padding-left: 1rem;
+    flex-shrink: 0;
+    transition: transform 100ms ease-in;
 }
-
+#controls-header{
+    display: flex;
+}
+#controls-header h3{
+    user-select: none;
+}
+#controls-header svg{
+    display: none;
+    transition: rotate 200ms ease-in;
+}
 .warning{
     background-color: var(--warning);
 }
@@ -63,6 +64,7 @@ html, body{
     font-size: smaller;
     font-style: italic;
     margin: 0;
+    padding-top: 0;
     text-align: center;
 }
 
@@ -71,23 +73,8 @@ html, body{
     background-color: var(--bg);
     color: var(--fg);
 }
-
-.controls section{
-    display: flex;
-    align-items: center;
-}
-#controls-header h3, #controls-header svg{
-    margin: .5rem .5rem 2rem 0;
-}
-#controls-header svg{
-    transition: rotate 200ms ease-in;
-}
-
 .rotated{
     rotate: 180deg;
-}
-.closed-controls{
-    transform: translate(50%, 85%);
 }
 
 #copy-dialog{
@@ -101,13 +88,183 @@ html, body{
 
 .image-control{
     display: flex;
+    flex-direction: column;
     gap: 1rem;
 }
 
 label{
     user-select: none;
 }
+
+.input-card{
+    border: 1px solid;
+    border-radius: 5px; 
+    margin: 0;
+    padding: 0;
+}
+.card-items{
+    border: none;
+    padding: 0;
+    margin: .5rem 0 0 0;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.card-items *:not(legend){
+    margin: .5rem;
+    align-items: center;
+}
+
+.input-card legend{
+    font-weight: 600;
+    float: left;
+    background-color: #1a1a1a;
+    border-bottom: 1px solid var(--fg);
+    padding: 0;
+    border-radius: 5px 5px 0 0;
+    width: 100%;
+    text-align: center;
+}
+
+.input-card input[type="range"]{
+    height:10px; 
+}
+.input-card input[type="range"]::-webkit-slider-thumb{
+    height:10px;
+    width:30px;
+}
+
+.input-card input[type="number"]{
+    -moz-appearance: textfield;
+    margin: 0;
+    color: var(--fg);
+    background-color: var(--bg);
+    border: 1px solid var(--fg);
+    border-radius: 5px;
+    text-align: center;
+}
+.input-card input[type="number"]::-webkit-inner-spin-button,
+.input-card input[type="number"]::-webkit-outer-spin-button{
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.input-card figure{
+    padding: .3rem;
+}
+
+.input-card input[type="file"]{
+    display: none;
+}
+.file-upload{
+    display: inline-block;
+    background-image: url(img/upload.svg);
+    background-size: 32px;
+    background-position: .5rem .4rem;
+    background-repeat: no-repeat;
+    width: 8.5rem;
+    height: 32px;
+    text-align: right;
+    text-wrap-mode: nowrap;
+    
+}
+.file-download{
+    display: inline-block;
+    background-image: url(img/download.svg);
+    background-size: 32px;
+    background-position: .5rem .4rem;
+    background-repeat: no-repeat;
+    width: 7rem;
+    height: 32px;
+    text-align: right;
+    text-wrap-mode: nowrap;
+    background-color: var(--bg);
+    color: var(--fg);
+    font-family: "Hanken Grotesk", sans-serif;
+    font-size: 16px;
+    position: relative;
+}
+
+.download-options{
+    display: none;
+    position: absolute;
+    transform: translate(8rem, -2.35rem);
+    z-index: 1;
+    background-color: var(--bg);
+    color: var(--fg);
+}
+.download-options option{
+    appearance: none;
+    padding: 1rem;
+    border-radius: 5px;
+    margin: 0;
+    border: 1px solid var(--fg);
+}
+.download-options option:hover{
+    background-color: #ffffff77;
+
+}
+
+.file-download:hover div{
+    font-family: "Hanken Grotesk", sans-serif;
+    font-size: 16px;
+    border: none;
+}
+
+.copy-ascii{
+    display: inline-block;
+    background-image: url(img/copy.svg);
+    background-size: 32px;
+    background-position: .5rem .5rem;
+    background-repeat: no-repeat;
+    width: 8rem;
+    height: 32px;
+    text-align: right;
+    text-wrap-mode: nowrap;
+
+}
+
+.button{
+    border: 1px solid var(--fg);
+    border-radius: 5px;
+    padding: .5rem;
+    cursor: pointer;
+    transition: all 100ms ease-in;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.button:hover{
+    background-color: #ffffff77;
+}
+
+.button p{
+    margin: 0;
+    width: 100%;
+}
+
 @media screen and (max-width: 768px) {
+    main{
+        overflow: hidden;
+    }
+    #container{
+        overflow-x: scroll;
+    }
+    .main-order{
+        display: flex;
+        flex-direction: column-reverse;
+    }
+    .controls{
+        width: 100%;
+        position: absolute;
+        bottom: 0;
+    }
+    #controls-header svg{
+        display: block;
+    }
     input[type='range']{
         height:10px; 
     }
@@ -116,3 +273,4 @@ label{
         width:30px;
     } 
 }
+

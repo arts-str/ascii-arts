@@ -1,4 +1,7 @@
 const sliders = document.querySelectorAll('input[type=range]');
+const downloadOptions = document.getElementById('download-options');
+const downloadOptionsMenu = document.getElementById('download-options-menu');
+const controlsHeader = document.getElementById('controls-header');
 
 function debounce(func, timeout = 300) {
   let timer;
@@ -138,4 +141,38 @@ for (const input of characterInput.elements) { //Para cada input del atlas
             drawAscii(); //Re-Dibujar
         }
     };
+}
+
+downloadOptions.onclick = () =>{
+  downloadOptionsMenu.style.display = 'block';
+}
+downloadOptions.onmouseleave = () =>{
+  downloadOptionsMenu.style.display = 'none';
+}
+
+var mql = window.matchMedia('screen and (max-width: 768px)');
+let isMobile = mql.matches;
+mql.onchange = () => {
+  if (mql.matches) {
+    isMobile = true;
+      
+  } else {
+    isMobile = false;
+  }
+}
+
+
+controlsHeader.onclick = () =>{
+  if (isMobile) {
+    const isTransformed = controlsHeader.parentElement.style.transform === 'translateY(88%)'
+    controlsHeader.parentElement.style.transform = isTransformed ? 'translateY(0)' : 'translateY(88%)';
+    controlsHeader.children[1].style.rotate = isTransformed ? '0deg' : '180deg'
+  }
+}
+controlsHeader.ontouchstart = () =>{
+  if (isMobile) {
+    const isTransformed = controlsHeader.parentElement.style.transform === 'translateY(88%)'
+    controlsHeader.parentElement.style.transform = isTransformed ? 'translateY(0)' : 'translateY(88%)';
+    controlsHeader.children[1].style.rotate = isTransformed ? '0deg' : '180deg'
+  }
 }

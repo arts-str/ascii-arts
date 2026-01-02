@@ -12,56 +12,71 @@
 </head>
 <body>
     <dialog id="copy-dialog"></dialog>
-    <main>
+    <main class="main-order">
         <form id="controls" class="controls">
             <section id="controls-header">
                 <h3>Controles</h3> 
                 <svg width="1.5rem" viewBox="0 0 24 24" class="arrowSvg color-mode-transition" fill="#f2f2f2" xmlns="http://www.w3.org/2000/svg"> <path d="M5.70711 9.71069C5.31658 10.1012 5.31658 10.7344 5.70711 11.1249L10.5993 16.0123C11.3805 16.7927 12.6463 16.7924 13.4271 16.0117L18.3174 11.1213C18.708 10.7308 18.708 10.0976 18.3174 9.70708C17.9269 9.31655 17.2937 9.31655 16.9032 9.70708L12.7176 13.8927C12.3271 14.2833 11.6939 14.2832 11.3034 13.8927L7.12132 9.71069C6.7308 9.32016 6.09763 9.32016 5.70711 9.71069Z"></path></svg>
             </section>
-            <fieldset>
+            <fieldset class="input-card">
                 <legend>Sube una imagen aquí</legend>
-                <input id="image-input" type="file" accept="image/*" name="imagen">
+                <fieldset class="card-items">
+                    <label for="image-input" class="file-upload button"><p>Subir imagen</p></label>
+                    <input id="image-input" type="file" accept="image/*" name="imagen">
+                    <label class="file-download button" name="download-options" id="download-options"> <p>Descargar</p>
+                        <div id="download-options-menu" class="download-options">
+                            <option value="png" id="download-png">Descargar PNG</option>
+                            <option value="svg" id="download-svg">Descargar SVG</option>
+                        </div>
+                    </label>
+                    
+                    <label type="button" class="copy-ascii button" id="copy-to-clipboard"><p>Copiar ASCII</p></label>
+                </fieldset>
+                
 
             </fieldset>
-            <fieldset>
+            <fieldset class="input-card">
                 <legend>Resolución</legend>
-                <input id="width-input" type="range" min="47" max="500" value="150" name="ancho">
-                <output id="width-output" for="width-input"></output>
+                <fieldset class="card-items">
+                    <input id="width-input-slider" type="range" min="47" max="500" value="150" name="ancho">
+                    <input id="width-input-number" type="number" min="47" max="500" value="150" name="ancho">
+                    <output for="width-input-number">caracteres</output>
+                </fieldset>
                 <figure id="width-warning" class="inactive"></figure>
+                
             </fieldset>
-            <fieldset id="character-inputs">
-                <legend>Caracteres de sombreado</legend>
-                <input type="text">
-                <input type="text">
-                <input type="text">
-                <input type="text">
-                <input type="text">
-                <input type="text">
-                <input type="text">
-                <input type="text">
+            <fieldset class="input-card" >
+                <legend>Caracteres de sombreado</legend>                
+                <fieldset id="character-inputs" class="card-items">
+                    <input type="text">
+                    <input type="text">
+                    <input type="text">
+                    <input type="text">
+                    <input type="text">
+                    <input type="text">
+                    <input type="text">
+                    <input type="text">
+                </fieldset>
             </fieldset>
-            <fieldset>
-                <legend>Descargar imagen</legend>
-                <button type="button" id="download-png">Descargar PNG</button>
-                <button type="button" id="download-svg">Descargar SVG</button>
-                <button type="button" id="copy-to-clipboard">Copiar ASCII</button>
-            </fieldset>
-            <fieldset class="image-control">
+            <fieldset class="image-control input-card">
                 <legend>Control de imagen</legend>
-                <div>
-                    <label for="invert-chars-input">Invertir imagen</label>
-                    <input id="invert-chars-input" type="checkbox">
+                
+                <fieldset class="card-items">
+                    <div>
+                        <label for="invert-chars-input">Invertir imagen</label>
+                        <input id="invert-chars-input" type="checkbox">
 
-                </div>
-                <div>
-                    <label for="monochrome-input">Color</label>
-                    <input id="monochrome-input" type="checkbox" checked>
+                    </div>
+                    <div>
+                        <label for="monochrome-input">Color</label>
+                        <input id="monochrome-input" type="checkbox" checked>
 
-                </div>
-                <div id="invert-color-controls">
-                    <label for="invert-color-input">Invertir colores</label>
-                    <input id="invert-color-input" type="checkbox">
-                </div>
+                    </div>
+                    <div id="invert-color-controls">
+                        <label for="invert-color-input">Invertir colores</label>
+                        <input id="invert-color-input" type="checkbox">
+                    </div>
+                </fieldset>
             </fieldset>
         </form>
         <pre id="container"></pre>
