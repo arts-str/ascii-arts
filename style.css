@@ -1,3 +1,7 @@
+*{
+    
+    box-sizing: border-box;
+}
 :root{
     --bg: #000000;
     --fg: #ffffff;
@@ -12,7 +16,6 @@
 html, body{
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
     background-color: var(--bg);
     color: var(--fg);
     touch-action: manipulation;
@@ -47,6 +50,7 @@ html, body{
 
 #controls-header{
     display: flex;
+    cursor: pointer;
 }
 #controls-header h3{
     font-family: "Quantico";
@@ -76,7 +80,7 @@ html, body{
 }
 
 #character-inputs input[type=text]{
-    width: 16px;
+    width: 22px;
     background-color: var(--bg);
     color: var(--fg);
 }
@@ -112,7 +116,6 @@ label{
     border: none;
     padding: 0;
     margin: .5rem 0 0 0;
-    position: relative;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -172,7 +175,6 @@ label{
 
     background-color: var(--fg);
     border-radius: 0;
-
     margin-top: -7px;
 }
 
@@ -250,7 +252,9 @@ label{
 .input-card input[type="checkbox"]:checked::after {
     background-color: var(--fg);
 }
-
+.image-control-options label{
+    cursor: pointer;
+}
 .image-control-options div{
     margin: 0;
     display: flex;
@@ -259,10 +263,10 @@ label{
 .file-upload{
     display: inline-block;
     background-image: url(img/upload.svg);
-    background-size: 32px;
-    background-position: .5rem .4rem;
+    background-size: 24px;
+    background-position: .5rem .1rem;
     background-repeat: no-repeat;
-    width: 8.5rem;
+    width: 9rem;
     height: 32px;
     text-align: right;
     text-wrap-mode: nowrap;
@@ -271,10 +275,10 @@ label{
 .file-download{
     display: inline-block;
     background-image: url(img/download.svg);
-    background-size: 32px;
-    background-position: .5rem .4rem;
+    background-size: 24px;
+    background-position: .5rem .1rem;
     background-repeat: no-repeat;
-    width: 7rem;
+    width: 8rem;
     height: 32px;
     text-align: right;
     text-wrap-mode: nowrap;
@@ -315,10 +319,10 @@ label{
 .copy-ascii{
     display: inline-block;
     background-image: url(img/copy.svg);
-    background-size: 32px;
-    background-position: .5rem .5rem;
+    background-size: 24px;
+    background-position: .5rem .2rem;
     background-repeat: no-repeat;
-    width: 8rem;
+    width: 9rem;
     height: 32px;
     text-align: right;
     text-wrap-mode: nowrap;

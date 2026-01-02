@@ -2,8 +2,8 @@ const sliders = document.querySelectorAll('input[type=range]');
 const downloadOptions = document.getElementById('download-options');
 const downloadOptionsMenu = document.getElementById('download-options-menu');
 const controlsHeader = document.getElementById('controls-header');
-
 const controls = document.getElementById('controls');
+
 function debounce(func, timeout = 300) {
   let timer;
   return (...args) => {
