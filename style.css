@@ -133,7 +133,7 @@ label{
     height:10px; 
 }
 .input-card input[type="range"]::-webkit-slider-thumb{
-    height:10px;
+    height:30px;
     width:30px;
 }
 
@@ -196,14 +196,14 @@ label{
     background-color: var(--bg);
     color: var(--fg);
 }
-.download-options option{
+.download-options div{
     appearance: none;
     padding: 1rem;
     border-radius: 5px;
     margin: 0;
     border: 1px solid var(--fg);
 }
-.download-options option:hover{
+.download-options div:hover{
     background-color: #ffffff77;
 
 }
@@ -236,6 +236,7 @@ label{
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 1;
 }
 .button:hover{
     background-color: #ffffff77;
@@ -264,6 +265,9 @@ label{
     }
     #controls-header svg{
         display: block;
+    }
+    .download-options{
+        transform: none;
     }
     input[type='range']{
         height:10px; 

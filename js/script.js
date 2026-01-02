@@ -11,7 +11,6 @@ const colorInput = document.getElementById("monochrome-input");
 const invertColorControls = document.getElementById('invert-color-controls');
 const invertColorInput = document.getElementById("invert-color-input");
 const invertCharsInput = document.getElementById("invert-chars-input");
-const controls = document.getElementById('controls');
 const canvas = document.createElement('canvas');
 const container = document.getElementById("container");
 const ctx = canvas.getContext('2d');

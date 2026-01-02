@@ -3,6 +3,7 @@ const downloadOptions = document.getElementById('download-options');
 const downloadOptionsMenu = document.getElementById('download-options-menu');
 const controlsHeader = document.getElementById('controls-header');
 
+const controls = document.getElementById('controls');
 function debounce(func, timeout = 300) {
   let timer;
   return (...args) => {
@@ -144,10 +145,20 @@ for (const input of characterInput.elements) { //Para cada input del atlas
 }
 
 downloadOptions.onclick = () =>{
-  downloadOptionsMenu.style.display = 'block';
+  const isOpen = downloadOptionsMenu.style.display === 'block'
+  
+  downloadOptionsMenu.style.display = isOpen ? 'none' : 'block';
 }
+
 downloadOptions.onmouseleave = () =>{
-  downloadOptionsMenu.style.display = 'none';
+  if (downloadOptionsMenu.style.display === 'block') {
+    downloadOptionsMenu.style.display = 'none';
+  }
+}
+downloadOptions.onblur = () =>{
+  if (downloadOptionsMenu.style.display === 'block') {
+    downloadOptionsMenu.style.display = 'none';
+  }
 }
 
 var mql = window.matchMedia('screen and (max-width: 768px)');
