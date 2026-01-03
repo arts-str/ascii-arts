@@ -183,7 +183,12 @@ mql.onchange = () => {
   }
 }
 
-
+window.onresize = () =>{
+  if (isMobile) {
+    const isTransformed = controlsHeader.parentElement.style.transform === 'translateY(88%)'
+    controlsHeader.parentElement.style.transform = 'translateY(0)';
+  }
+}
 controlsHeader.onclick = () =>{
   if (isMobile) {
     const isTransformed = controlsHeader.parentElement.style.transform === 'translateY(88%)'

@@ -45,7 +45,7 @@ html, body{
     background-color: #000000aa;
     flex-shrink: 0;
     transition: transform 100ms ease-in;
-    padding: 1rem;
+    padding: 0 1rem 1rem 1rem;
 }
 
 #controls-header{
@@ -55,7 +55,7 @@ html, body{
     font-family: "Quantico";
     font-size: 16pt;
     font-weight: 400;
-    line-height: 32px;
+    line-height: 24px;
     user-select: none;
 }
 #controls-header svg{
@@ -350,11 +350,29 @@ label{
     width: 100%;
 }
 
+.footer{
+    position: fixed;
+    bottom: 0;
+    background-color: var(--bg);
+    color: var(--fg);
+    width: 60%;
+    margin: 0 0 0 50%;
+    transform: translateX(-50%);
+    border-radius: 5px;
+    text-align: center;
+    line-height: 32px;
+}
+
 @media screen and (max-width: 768px) {
+    body{
+        overflow: hidden;
+    }
     main{
         overflow: hidden;
     }
     #container{
+        position: relative;
+        top: 32px;
         overflow-x: scroll;
     }
     .main-order{
@@ -362,6 +380,7 @@ label{
         flex-direction: column-reverse;
     }
     .controls{
+        z-index: 1;
         padding: 0;
         width: 100dvw;
         position: absolute;
@@ -376,6 +395,10 @@ label{
     .download-options{
         transform: translate(0%, 75%);
     }
-
+    .footer{
+        top: 0;
+        bottom: initial;
+        width: 100%;
+    }
 }
 
