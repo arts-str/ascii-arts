@@ -133,19 +133,25 @@ function mostrarDialog(dialog) {
 }
 
 for (const input of characterInput.elements) { //Para cada input del atlas
+  input.onclick = () =>{
+    input.select();
+  }
     input.oninput = () => { //Al ingresar un valor
-        //Mantener solo el primer caracter tipeado
-        input.value = input.value.slice(0, 1);
-
-        //Busca la posición del caracter
-        const position = [...characterInput.elements].indexOf(input);
-
-        //Si la input esta vacía, usar un espacio, sino rellenar con el valor de la input
-        atlas[position] = input.value === "" ? " " : input.value;
-
-        if (img.src !== "") { //Si la imagen no esta vacía
-            drawAscii(); //Re-Dibujar
-        }
+      //Mantener solo el primer caracter tipeado
+      input.value = input.value.slice(0, 1);
+      if (input.value === ">" || input.value === "<") {
+        input.value = input.value.replace("<", " ");
+        input.value = input.value.replace(">", " ");
+        copyDialog.textContent = "No se puede utilizar ese caracter :(" //Cambia el texto del dialog
+        mostrarDialog(copyDialog); //Lo muestra
+      }
+      //Busca la posición del caracter
+      const position = [...characterInput.elements].indexOf(input);
+      //Si la input esta vacía, usar un espacio, sino rellenar con el valor de la input
+      atlas[position] = input.value === "" ? " " : input.value;
+      if (img.src !== "") { //Si la imagen no esta vacía
+          drawAscii(); //Re-Dibujar
+      }
     };
 }
 

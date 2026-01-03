@@ -50,7 +50,6 @@ html, body{
 
 #controls-header{
     display: flex;
-    cursor: pointer;
 }
 #controls-header h3{
     font-family: "Quantico";
@@ -140,6 +139,7 @@ label{
     border-radius: 5px 5px 0 0;
     width: 100%;
     text-align: center;
+    margin-bottom: .2rem;
 }
 
 .input-card input[type="range"] {
@@ -211,6 +211,7 @@ label{
     margin: 0;
 }
 .input-card input[type="text"]{
+    text-align: center;
     border: 2px solid currentColor;
 }
 .input-card input[type="text"]:focus{
@@ -291,20 +292,21 @@ label{
 .download-options{
     display: none;
     position: absolute;
-    transform: translate(100%, 25px);
+    transform: translate(100%, 25%);
     z-index: 1;
     color: var(--fg);
     transition: transform 100ms ease-in;
 }
 .download-options div{
     appearance: none;
-    width: 7rem;
+    width: fit-content;
     height: 32px;
     border-radius: 5px;
     margin: 0;
     padding: .5rem;
     background-color: var(--bg);
     border: 1px solid var(--fg);
+    line-height: 14px;
 }
 .download-options div:hover{
     background-color: #a7a7a7;
@@ -364,6 +366,9 @@ label{
         width: 100dvw;
         position: absolute;
         bottom: 0;
+    }
+    #controls-header{ 
+        cursor: pointer;
     }
     #controls-header svg{
         display: block;
