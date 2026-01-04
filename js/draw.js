@@ -18,11 +18,8 @@ function drawAsciiColor() {
     ctx.drawImage(img, 0, 0, width, height); //Dibuja la imagen
 
     imgData = ctx.getImageData(0, 0, width, height); //Toma la data de la imagen
-    if (isColorInverted) invertImg(imgData);
-    posterizeImageData(imgData, 3);
+    let [colors, bw] = completeColorPreProcessing(imgData)
     ctx.putImageData(imgData, 0, 0);
-    const bw = returnPixelBWValueFromData(imgData); //Valores en ByN para decidir el caracter
-    const colors = returnPixelColorValue(imgData); //Valores a color para pintar el caracter
 
     let html = '' //String vacia para llenar con html
     let lastColor = null; //Color anterior para decidir si crear un nuevo span
@@ -83,8 +80,6 @@ function drawAsciiMonochromatic() {
 
     container.innerHTML = line; //Agrega el ascii al container
 }
-
-
 /**
  * Devuelve el valor ByN de la imagen
  * @param {*} imgData Objeto de datos de imagen
@@ -100,20 +95,6 @@ function returnPixelBWValueFromData(imgData) {
     return pixels //Devuelve el array de pixeles
 }
 
-/**
- * Devuelve el valor [R, G, B] de la imagen
- * @param {*} imgData 
- * @returns Array de pixeles
- */
-function returnPixelColorValue(imgData) {
-    let data = imgData.data; //RGB de la imagen
-    let pixels = []; //Array vacio de pixeles
-    for (let i = 0; i < data.length; i+=4) { //Cada 4 valores
-        pixels.push([data[i], data[i+1], data[i+2]]) //Agrega los primeros 3 al array de pixeles (Omite transparencia)
-        
-    }
-    return pixels //Devuelve el array de pixeles
-}
 
 /**Devuelve el caracter correcto dependiendo del valor del pixel */
 function returnAltasForValue(value) {
@@ -133,35 +114,81 @@ function drawAscii() {
     }
 }
 
-/**
- * Funcion para invertir los colores del canvas
- * @param {*} imgData De un contexto canvas
- */
-function invertImg(imgData) {
-    let data = imgData.data; //Toma los valores rgb de la imagen
-    for (let i = 0; i < data.length; i+=4) { //Cada 4 valores
-        //Resta 255 - el valor actual del canal correspondiente, invirtiendo el color
-        data[i] = 255 - data[i]; //R
-        data[i+1] = 255 - data[i+1]; //G
-        data[i+2] = 255 - data[i+2]; //B
-    }
-}
-/**
- * Posteriza los datos de imagen reduciendo la profundidad de colores
- * @param {*} imgData De un contexto canvas
- * @param {*} bits Numero entero de bits por canal (Por defecto 3)
- */
-function posterizeImageData(imgData, bits=3){
-
+function completeColorPreProcessing(imgData, bits=3) {
+    let data = imgData.data;
     const mask = 0xFF << (8 - bits); //Bitmask que retiene los bits superiores del valor de color
-    const data = imgData.data; //Toma los valores rgb de la imagen
+    let colorPixels = [];
+    let bwPixels = [];
+    for (let i = 0; i < data.length; i+=4) {
 
-    for (let i = 0; i < data.length; i+=4) { //Cada 4 valores
+        if (isColorInverted) {
+            //Resta 255 - el valor actual del canal correspondiente, invirtiendo el color
+            data[i] = 255 - data[i]; //R
+            data[i+1] = 255 - data[i+1]; //G
+            data[i+2] = 255 - data[i+2]; //B
+        }
         //Aplica la mascara al canal correspondiente
         data[i] = data[i] & mask; //R
         data[i+1] = data[i+1] & mask; //G
         data[i+2] = data[i+2] & mask; //B
-
-
+        
+        let avg = Math.round((data[i] + data[i+1] + data[i+2]) / 3); //Promedia los 3 valores de color
+        bwPixels.push(avg); //Los agrega al array de pixeles
+        colorPixels.push([data[i], data[i+1], data[i+2]]) //Agrega los primeros 3 al array de pixeles (Omite transparencia)
     }
+    return [colorPixels, bwPixels];
 }
+
+/**OLD PROCESSING CODE
+ * 
+ */
+
+///**
+// * Funcion para invertir los colores del canvas
+// * @param {*} imgData De un contexto canvas
+// */
+//function invertImg(imgData) {
+//    let data = imgData.data; //Toma los valores rgb de la imagen
+//    for (let i = 0; i < data.length; i+=4) { //Cada 4 valores
+//        //Resta 255 - el valor actual del canal correspondiente, invirtiendo el color
+//        data[i] = 255 - data[i]; //R
+//        data[i+1] = 255 - data[i+1]; //G
+//        data[i+2] = 255 - data[i+2]; //B
+//    }
+//}
+///**
+// * Posteriza los datos de imagen reduciendo la profundidad de colores
+// * @param {*} imgData De un contexto canvas
+// * @param {*} bits Numero entero de bits por canal (Por defecto 3)
+// */
+//function posterizeImageData(imgData, bits=3){
+//
+//    const mask = 0xFF << (8 - bits); //Bitmask que retiene los bits superiores del valor de color
+//    let data = imgData.data; //Toma los valores rgb de la imagen
+//
+//    for (let i = 0; i < data.length; i+=4) { //Cada 4 valores
+//        //Aplica la mascara al canal correspondiente
+//        data[i] = data[i] & mask; //R
+//        data[i+1] = data[i+1] & mask; //G
+//        data[i+2] = data[i+2] & mask; //B
+//
+//
+//    }
+//}
+//
+
+//
+///**
+// * Devuelve el valor [R, G, B] de la imagen
+// * @param {*} imgData 
+// * @returns Array de pixeles
+// */
+//function returnPixelColorValue(imgData) {
+//    let data = imgData.data; //RGB de la imagen
+//    let pixels = []; //Array vacio de pixeles
+//    for (let i = 0; i < data.length; i+=4) { //Cada 4 valores
+//        pixels.push([data[i], data[i+1], data[i+2]]) //Agrega los primeros 3 al array de pixeles (Omite transparencia)
+//        
+//    }
+//    return pixels //Devuelve el array de pixeles
+//}
