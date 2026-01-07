@@ -51,7 +51,7 @@ function saveAsciiAsImage() {
 
 
     }else{ //Si esta en modo monocromatico
-        const lines = container.innerHTML.split('<br>'); //Dividir el contenido del texto en lineas
+        const lines = container.innerHTML.split('\n'); //Dividir el contenido del texto en lineas
         const lineText = lines[0].replace(/<[^>]*>/g, ''); //Separa el contenido de texto
         saveCanvas.width = lineText.length * (lineHeight *0.6); //Setea el canvas al ancho maximo de las lineas
         saveCanvas.height = lines.length * lineHeight; //El alto a la cantidad de lineas * el interlineado
@@ -122,7 +122,7 @@ function saveAsciiSvg() {
             xPos = 0; //Resetea la posicion en x a 0
         });
     }else{
-        lines = art.split('<br>'); //Separa las lineas con los saltos de página        
+        lines = art.split('\n'); //Separa las lineas con los saltos de página        
         lineWidth = lines[0].length * (lineHeight * 0.6) //Calcular el ancho de linea
         lines.forEach((line, i) =>{ //Para cada linea
             let textLine = document.createElement('text'); //Crea un elemento text

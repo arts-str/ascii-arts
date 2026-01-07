@@ -74,7 +74,7 @@ function drawAsciiMonochromatic() {
     for (let i = 0; i < bw.length; i++) { //Por cada valor blanco y negro
         line += returnAltasForValue(bw[i]) //Agregar a la linea el caracter correcto para esa posición
         if ((i+1) % width === 0) { //Si llega al final de la linea
-            line += "<br>"; //Agregar salto de pagina
+            line += "\n"; //Agregar salto de pagina
         }
     }
 

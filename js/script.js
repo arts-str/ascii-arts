@@ -145,7 +145,7 @@ function updateInvertControlsVisibility() {
 
 /**Actualiza los valores para calcular el tamaño de fuente correcto */
 function updateFontSizeValues() {
-    const rows = colorMode ? container.innerHTML.split('\n').length : container.innerHTML.split('<br>').length; //Difiere la manera de leer la cantidad de lineas si esta en modo color o no
+    const rows = colorMode ? container.innerHTML.split('\n').length : container.innerHTML.split('\n').length; //Difiere la manera de leer la cantidad de lineas si esta en modo color o no
     const viewportHeight = window.innerHeight; //Altura del viewport
     return [viewportHeight, rows] //Devuelve los valores
 }
